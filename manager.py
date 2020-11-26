@@ -3,6 +3,9 @@ from inputwindow import StartParameters
 
 class Manager:
 
+    def __init__(self):
+        self.parameters = None
+
     def start(self):
         """
         Starts execution of the program
@@ -14,4 +17,4 @@ class Manager:
         Starts calculation of solutions
         :param params: a set of parameters set by user
         """
-        pass
+        self.parameters = params

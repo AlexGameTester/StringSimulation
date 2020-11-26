@@ -1,6 +1,3 @@
-from manager import Manager
-
-
 class StartParameters:
     """
     Represents a list of parameters set by user
@@ -12,7 +9,7 @@ class InputWindow:
     """
     Represents a window that is displayed when the program is launched. User sets parameters in this window
     """
-    def __init__(self, manager: Manager):
+    def __init__(self, manager):
         self.manager = manager
 
     def _get_start_parameters(self) -> StartParameters:
