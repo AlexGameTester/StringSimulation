@@ -16,6 +16,8 @@ class Simulator(ABC):
     @abstractmethod
     def get_method(self) -> Callable[[float], None]:
         """
+        Returns a method that is called in cycle of CalculationsManager
+
         :return: a method that will be called in CalculationsManager
         """
         pass
@@ -24,6 +26,7 @@ class Simulator(ABC):
     def get_simulation(self) -> Simulation:
         """
         Returns a discrete function of time and coordinate that represents simulated string
+
         :return: a Simulation instance that contains information about simulation
         """
         pass

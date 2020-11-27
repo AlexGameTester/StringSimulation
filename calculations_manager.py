@@ -35,6 +35,7 @@ class CalculationsManager:
     def _get_simulation_parameters(self) -> SimulationParameters:
         """
         Sets simulation parameters to an instance of SimulationParameters and returns it
+
         :return: a SimulationParameters instance with set parameters
         """
         pass

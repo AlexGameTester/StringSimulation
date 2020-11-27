@@ -19,6 +19,7 @@ class Manager:
     def start_calculation(self, params: StartParameters):
         """
         Starts calculation of solutions
+
         :param params: a set of parameters set by user
         """
         assert params
