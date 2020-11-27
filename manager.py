@@ -1,5 +1,5 @@
 from inputwindow import StartParameters
-from simulation import Simulation, SimulationType
+from simulation import Simulation
 
 
 class Manager:
@@ -25,21 +25,27 @@ class Manager:
 
         self._start_parameters = params
 
-    def set_simulation(self, simulation: Simulation, simulation_type: SimulationType) -> None:
+    def set_simulations(self, math_simulation: Simulation, phys_simulation: Simulation) -> None:
         """
         Saves simulation of some type into manager
-        :param simulation: a simulation
-        :param simulation_type: a type of simulation
-        """
-        assert simulation
-        assert simulation_type
-        if simulation_type == SimulationType.mathematical:
-            self._mathematical_simulation = simulation
-        else:
-            self._physical_simulation = simulation
 
-    def on_calculation_ended(self):
+        :param phys_simulation: a simulation provided by physical simulator
+        :param math_simulation: a simulation provided by mathematical simulator
+        """
+        assert phys_simulation
+        assert math_simulation
+
+        self._physical_simulation = phys_simulation
+        self._mathematical_simulation = math_simulation
+
+    def on_calculation_ended(self) -> None:
         """
         Called (by CalculationsManager) when calculation of simulation is ended
+        """
+        pass
+
+    def start_output(self):
+        """
+        Starts process of showing animated string and plots
         """
         pass

@@ -2,11 +2,6 @@ from typing import List, Tuple
 from enum import Enum, auto
 
 
-class SimulationType(Enum):
-    mathematical = auto()
-    physical = auto()
-
-
 class Simulation:
     """
     Represents a discrete function of time and coordinate that represents a simulation of string motion

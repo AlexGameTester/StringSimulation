@@ -1,7 +1,6 @@
 from inputwindow import StartParameters
 from math_simulator import MathematicalSimulator
 from physical_simulator import PhysicalSimulator
-from simulation import SimulationType
 
 
 class SimulationParameters:
@@ -61,8 +60,7 @@ class CalculationsManager:
         phys_sim = self._physical_simulator.get_simulation()
         math_sim = self._mathematical_simulator.get_simulation()
 
-        self.manager.set_simulation(phys_sim, SimulationType.physical)
-        self.manager.set_simulation(math_sim, SimulationType.mathematical)
+        self.manager.set_simulations(math_simulation=math_sim, phys_simulation=phys_sim)
 
         self.manager.on_calculation_ended()
 
