@@ -1,4 +1,5 @@
 from inputwindow import StartParameters
+from simulation import Simulation, SimulationType
 
 
 class Manager:
@@ -18,3 +19,9 @@ class Manager:
         :param params: a set of parameters set by user
         """
         self.parameters = params
+
+    def set_simulation(self, simulation: Simulation, simulation_type: SimulationType) -> None:
+        pass
+
+    def on_calculation_ended(self):
+        pass

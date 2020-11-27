@@ -26,4 +26,5 @@ class InputWindow:
         Called when user presses 'Start' button. Starts calculation of parameters
         """
         self.manager.start_calculation(self._get_start_parameters())
+        # TODO: this method is likely to be never called. Probably one should put closing of a window somewhere earlier
         self._close()
