@@ -1,6 +1,7 @@
 from inputwindow import StartParameters
 from math_simulator import MathematicalSimulator
 from physical_simulator import PhysicalSimulator
+from simulation import SimulationType
 
 
 class SimulationParameters:
@@ -53,7 +54,16 @@ class CalculationsManager:
     def _show_progress_bar(self):
         pass
 
-    def end_calculation(self):
-        pass
+    def _end_calculation(self):
+        assert self._physical_simulator
+        assert self._mathematical_simulator
+
+        phys_sim = self._physical_simulator.get_simulation()
+        math_sim = self._mathematical_simulator.get_simulation()
+
+        self.manager.set_simulation(phys_sim, SimulationType.physical)
+        self.manager.set_simulation(math_sim, SimulationType.mathematical)
+
+        self.manager.on_calculation_ended()
 
 
