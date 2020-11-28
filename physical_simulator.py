@@ -1,5 +1,6 @@
 from typing import Callable
 import math
+import time
 
 import pygame
 
@@ -22,10 +23,17 @@ screen.fill(WHITE)
 
 
 class Point:
-    def __init__(self, x, y, y_velocity):
-        self.x = int(x) + SCREEN_WIDTH // 3
+    def __init__(self, x, y, y_velocity, number):
+        self.x = int(x) + SCREEN_WIDTH // 4
         self.y = int(y) + SCREEN_HEIGHT // 2
-        self.velocity = y_velocity
+        self.velocity = int(y_velocity)
+        self.number = number
+
+    def interact(self):
+        pass
+
+    def move(self, delta_t):
+        self.y += int(self.velocity * delta_t)
 
 
 class PhysicalSimulator(Simulator):
@@ -36,11 +44,14 @@ class PhysicalSimulator(Simulator):
     def __init__(self, params):
         super().__init__(params)
         self.points = []
+        self.my_time = time.time()
         with open("physical_points.txt") as points_file:
+            number = 0
             for data_string in points_file:
                 x, y, y_velocity = data_string.split()
-                point = Point(x, y, y_velocity)
+                point = Point(x, y, y_velocity, number)
                 self.points.append(point)
+                number += 1
         print(self.points)
 
     def get_method(self) -> Callable[[float], None]:
@@ -50,9 +61,15 @@ class PhysicalSimulator(Simulator):
         pass
 
     def simulate(self):
-        pass
+        delta_time = time.time() - self.my_time
+        for point in self.points:
+            point.interact()
+            point.move(delta_time)
+
+        self.my_time = time.time()
 
     def draw(self):
+        screen.fill(WHITE)
         for point in self.points:
             pygame.draw.circle(screen,
                                BLACK,
@@ -61,9 +78,9 @@ class PhysicalSimulator(Simulator):
 
 
 def main():
-    amount_of_points = 10
-    length = SCREEN_WIDTH // 3
-    max_velocity = 30
+    amount_of_points = 30
+    length = SCREEN_WIDTH // 2
+    max_velocity = 200
 
     create_init_params(amount_of_points, length, max_velocity)
 
@@ -94,7 +111,7 @@ def create_init_params(amount_of_points, length, max_velocity):
     y = 0
     with open("physical_points.txt", "w") as points:
         for i in range(amount_of_points):
-            velocity = max_velocity * math.sin(2 * math.pi * i / amount_of_points)
+            velocity = int(max_velocity * math.sin(2 * math.pi * i / amount_of_points))
             point = str(x) + " " + str(y) + " " + str(velocity) + "\n"
             points.write(point)
 
