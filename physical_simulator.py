@@ -1,7 +1,6 @@
 from typing import Callable
 import math
 import time
-import numpy
 
 import pygame
 
@@ -13,7 +12,7 @@ SCREEN_HEIGHT = 900
 FPS = 60
 
 POINT_RADIUS = 5
-CALC_NUMBER = 85
+CALC_NUMBER = 1000
 K = 80
 M = 1
 
@@ -42,8 +41,8 @@ class Point:
         right_force_y = (K * math.fabs(right_distance - length_0) *
                          (right_point_y - self.y) / right_distance)
 
-        force = numpy.array([left_force_y, right_force_y])
-        acceleration = float(numpy.sum(force / M))
+        #force = numpy.array([left_force_y, right_force_y])
+        acceleration = float((left_force_y + right_force_y) / M)
 
         self.velocity -= acceleration * delta_t
 
@@ -98,7 +97,7 @@ class PhysicalSimulator(Simulator):
 
 
 def main():
-    amount_of_points = 20
+    amount_of_points = 10
     length = SCREEN_WIDTH // 2
     max_velocity = 200
 
@@ -133,7 +132,7 @@ def create_init_params(amount_of_points, length, max_velocity):
     y = 0
     with open("physical_points.txt", "w") as points:
         for i in range(amount_of_points):
-            velocity = int(max_velocity * math.sin(2 * math.pi * i / amount_of_points))
+            velocity = int(max_velocity * math.sin(1 * math.pi * i / amount_of_points))
             point = str(x) + " " + str(y) + " " + str(velocity) + "\n"
             points.write(point)
 
