@@ -12,6 +12,11 @@ class MathematicalSimulator(Simulator):
     """
 
     def __init__(self, params):
+        """
+        Creates MathematicalSimulator instance
+
+        :param params: a SimulationParameters instance
+        """
         # TODO: Specific way to get this values will be written later
         # assert params
 
@@ -122,7 +127,7 @@ class FourierSolver:
 
         return False
 
-    def get_points_function(self):
+    def get_points_function(self) -> Callable[[float], np.ndarray]:
         """
         Gives a function that returns points positions at some time
 
