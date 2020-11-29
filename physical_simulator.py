@@ -12,7 +12,8 @@ SCREEN_HEIGHT = 900
 FPS = 60
 
 POINT_RADIUS = 5
-CALC_NUMBER = 1000
+CALC_NUMBER = 100
+DELTA_TIME = 1
 K = 80
 M = 1
 
@@ -30,9 +31,11 @@ class Point:
         self.y = int(y) + SCREEN_HEIGHT // 2
         self.velocity = int(y_velocity)
         self.number = number
+        self.time = 0
+        self.coordinates = [{'t': self.time, 'x': self.x, 'y': self.y}]
 
     def interact(self, left_point_x, left_point_y, right_point_x, right_point_y,
-                 length_0, delta_t):
+                 length_0):
         left_distance = math.sqrt((self.x - left_point_x)**2 + (self.y - left_point_y)**2)
         right_distance = math.sqrt((self.x - right_point_x)**2 + (self.y - right_point_y)**2)
 
@@ -41,13 +44,14 @@ class Point:
         right_force_y = (K * math.fabs(right_distance - length_0) *
                          (right_point_y - self.y) / right_distance)
 
-        #force = numpy.array([left_force_y, right_force_y])
-        acceleration = float((left_force_y + right_force_y) / M)
+        acceleration = (left_force_y + right_force_y) / M
 
-        self.velocity -= acceleration * delta_t
+        self.velocity -= acceleration * DELTA_TIME
 
-    def move(self, delta_t):
-        self.y -= self.velocity * delta_t
+    def move(self):
+        self.time += DELTA_TIME
+        self.y -= self.velocity * DELTA_TIME
+        self.coordinates.append({'t': self.time, 'x': self.x, 'y': self.y})
 
 
 class PhysicalSimulator(Simulator):
@@ -58,7 +62,7 @@ class PhysicalSimulator(Simulator):
     def __init__(self, params, length_0):
         super().__init__(params)
         self.points = []
-        self.my_time = time.time()
+        self.my_time = 0
         self.length_0 = length_0
         with open("physical_points.txt") as points_file:
             number = 0
@@ -76,16 +80,15 @@ class PhysicalSimulator(Simulator):
 
     def simulate(self):
         for i in range(CALC_NUMBER):
-            delta_time = time.time() - self.my_time
-            self.my_time = time.time()
+            self.my_time += DELTA_TIME
             for point in self.points:
                 if point.number != 0 and point.number != len(self.points)-1:
                     point.interact(self.points[point.number - 1].x,
                                    self.points[point.number - 1].y,
                                    self.points[point.number + 1].x,
                                    self.points[point.number + 1].y,
-                                   self.length_0, delta_time)
-                    point.move(delta_time)
+                                   self.length_0)
+                    point.move()
 
     def draw(self):
         screen.fill(WHITE)
@@ -104,6 +107,7 @@ def main():
     length_0 = create_init_params(amount_of_points, length, max_velocity)
 
     phys_sim = PhysicalSimulator(10, length_0)
+    phys_sim.simulate()
 
     clock = pygame.time.Clock()
     finished = False
@@ -118,7 +122,6 @@ def main():
                 if key == pygame.K_q or key == pygame.K_ESCAPE:
                     finished = True
 
-        phys_sim.simulate()
         phys_sim.draw()
 
         pygame.display.set_caption(str(clock.get_fps()))
