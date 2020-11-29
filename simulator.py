@@ -14,7 +14,7 @@ class Simulator(ABC):
         pass
 
     @abstractmethod
-    def get_method(self) -> Callable[[float], None]:
+    def get_method(self) -> Callable[[None], None]:
         """
         Returns a method that is called in cycle of CalculationsManager
 
@@ -25,9 +25,18 @@ class Simulator(ABC):
     @abstractmethod
     def get_simulation(self) -> Simulation:
         """
-        Returns a discrete function of time and coordinate that represents simulated string
+        Returns a calculated simulation
 
         :return: a Simulation instance that contains information about simulation
+        """
+        pass
+
+    @abstractmethod
+    def get_completion_percentage(self) -> float:
+        """
+        Returns completion percentage of calculations
+
+        :return: a float completion percentage between 0(0%) and 1(100%)
         """
         pass
 

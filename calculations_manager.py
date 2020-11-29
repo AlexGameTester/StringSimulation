@@ -2,12 +2,43 @@ from inputwindow import StartParameters
 from math_simulator import MathematicalSimulator
 from physical_simulator import PhysicalSimulator
 
+import numpy as np
+
 
 class SimulationParameters:
     """
     Represents a list of parameters that is set by CalculationsManager and given to simulators
     """
-    pass
+
+    def __init__(self, speed_of_light: float,
+                 initial_positions_x: np.ndarray,
+                 initial_positions_y: np.ndarray,
+                 initial_velocities_y: np.ndarray,
+                 accuracy=1,
+                 **kwargs):
+        assert speed_of_light > 0
+        self.speed_of_light = speed_of_light
+        """Speed of light in the string"""
+
+        assert initial_positions_x.shape == initial_positions_y.shape == initial_velocities_y.shape
+        assert len(initial_positions_x.shape) == 1
+        assert initial_positions_x.shape[0] > 0
+        self.initial_positions_x = initial_positions_x
+        """Numpy array with points initial x-coordinates"""
+        self.initial_positions_y = initial_positions_y
+        """Numpy array with points initial y-coordinates"""
+        self.initial_velocities_y = initial_velocities_y
+        """Numpy array with points initial y-velocities"""
+
+        assert accuracy > 0
+        self.accuracy = accuracy
+        """Integer parameter proportional to accuracy of calculations"""
+
+        if 'string_length' in kwargs.keys():
+            self.string_length = kwargs['string_length']
+        else:
+            string_length = abs(initial_positions_x[0] - initial_positions_x[len(initial_positions_x)])
+            self.string_length = string_length
 
 
 class ProgressBar:
