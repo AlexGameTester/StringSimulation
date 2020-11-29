@@ -1,6 +1,7 @@
 from typing import Callable
 import math
 import time
+import numpy
 
 import pygame
 
@@ -9,10 +10,12 @@ from simulator import Simulator
 
 SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 900
-FPS = 200
+FPS = 60
 
 POINT_RADIUS = 5
-CALC_NUMBER = 100
+CALC_NUMBER = 85
+K = 80
+M = 1
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -29,11 +32,23 @@ class Point:
         self.velocity = int(y_velocity)
         self.number = number
 
-    def interact(self):
-        pass
+    def interact(self, left_point_x, left_point_y, right_point_x, right_point_y,
+                 length_0, delta_t):
+        left_distance = math.sqrt((self.x - left_point_x)**2 + (self.y - left_point_y)**2)
+        right_distance = math.sqrt((self.x - right_point_x)**2 + (self.y - right_point_y)**2)
+
+        left_force_y = (K * math.fabs(left_distance - length_0) *
+                        (left_point_y - self.y) / left_distance)
+        right_force_y = (K * math.fabs(right_distance - length_0) *
+                         (right_point_y - self.y) / right_distance)
+
+        force = numpy.array([left_force_y, right_force_y])
+        acceleration = float(numpy.sum(force / M))
+
+        self.velocity -= acceleration * delta_t
 
     def move(self, delta_t):
-        self.y += int(self.velocity * delta_t)
+        self.y -= self.velocity * delta_t
 
 
 class PhysicalSimulator(Simulator):
@@ -41,10 +56,11 @@ class PhysicalSimulator(Simulator):
     Represents a physical way to simulate the process
     """
 
-    def __init__(self, params):
+    def __init__(self, params, length_0):
         super().__init__(params)
         self.points = []
         self.my_time = time.time()
+        self.length_0 = length_0
         with open("physical_points.txt") as points_file:
             number = 0
             for data_string in points_file:
@@ -52,7 +68,6 @@ class PhysicalSimulator(Simulator):
                 point = Point(x, y, y_velocity, number)
                 self.points.append(point)
                 number += 1
-        print(self.points)
 
     def get_method(self) -> Callable[[float], None]:
         pass
@@ -61,30 +76,35 @@ class PhysicalSimulator(Simulator):
         pass
 
     def simulate(self):
-        delta_time = time.time() - self.my_time
-        for point in self.points:
-            point.interact()
-            point.move(delta_time)
-
-        self.my_time = time.time()
+        for i in range(CALC_NUMBER):
+            delta_time = time.time() - self.my_time
+            self.my_time = time.time()
+            for point in self.points:
+                if point.number != 0 and point.number != len(self.points)-1:
+                    point.interact(self.points[point.number - 1].x,
+                                   self.points[point.number - 1].y,
+                                   self.points[point.number + 1].x,
+                                   self.points[point.number + 1].y,
+                                   self.length_0, delta_time)
+                    point.move(delta_time)
 
     def draw(self):
         screen.fill(WHITE)
         for point in self.points:
             pygame.draw.circle(screen,
                                BLACK,
-                               (point.x, point.y),
+                               (point.x, int(point.y)),
                                POINT_RADIUS)
 
 
 def main():
-    amount_of_points = 30
+    amount_of_points = 20
     length = SCREEN_WIDTH // 2
     max_velocity = 200
 
-    create_init_params(amount_of_points, length, max_velocity)
+    length_0 = create_init_params(amount_of_points, length, max_velocity)
 
-    phys_sim = PhysicalSimulator(10)
+    phys_sim = PhysicalSimulator(10, length_0)
 
     clock = pygame.time.Clock()
     finished = False
@@ -102,6 +122,8 @@ def main():
         phys_sim.simulate()
         phys_sim.draw()
 
+        pygame.display.set_caption(str(clock.get_fps()))
+
         pygame.display.update()
 
 
@@ -116,6 +138,8 @@ def create_init_params(amount_of_points, length, max_velocity):
             points.write(point)
 
             x += delta_r
+
+    return delta_r // 3
 
 
 if __name__ == "__main__":
