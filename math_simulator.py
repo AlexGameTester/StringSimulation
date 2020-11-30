@@ -11,6 +11,9 @@ class MathematicalSimulator(Simulator):
     Represents a mathematical way to simulate the process
     """
 
+    def get_completion_percentage(self) -> float:
+        pass
+
     def __init__(self, params):
         """
         Creates MathematicalSimulator instance

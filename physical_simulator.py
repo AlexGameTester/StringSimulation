@@ -73,6 +73,9 @@ class PhysicalSimulator(Simulator):
     Represents a physical way to simulate the process
     """
 
+    def get_completion_percentage(self) -> float:
+        pass
+
     def __init__(self, params, length_0):
         super().__init__(params)
         self.points = []
