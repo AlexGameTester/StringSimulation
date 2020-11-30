@@ -1,20 +1,15 @@
-from typing import List, Tuple
-from enum import Enum, auto
+from abc import ABC, abstractmethod
+
+import numpy as np
 
 
-class Simulation:
+class Simulation(ABC):
     """
     Represents a discrete function of time and coordinate that represents a simulation of string motion
     """
-    def pack_time(self, times: List[float]) -> None:
-        """
-        Saves information about time in this object
 
-        :param times: an array of moments of time that were simulated
-        """
-        pass
-
-    def get_points(self, time: float) -> List[Tuple[float, float]]:
+    @abstractmethod
+    def get_points_at(self, time: float) -> np.ndarray:
         """
         Returns a set of points **in consecutive order** that represents a string at specific moment of time
 
