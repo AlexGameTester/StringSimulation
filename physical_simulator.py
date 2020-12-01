@@ -21,6 +21,21 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 
+class PhysicalSimulation(Simulation):
+
+    def get_points_at(self, time_moment: int) -> list:
+        length_0 = 2
+
+        phys_simulator = PhysicalSimulator(10, length_0)
+        phys_simulator.simulate()
+
+        points_coord = []
+        for point in phys_simulator.points:
+            points_coord.append(point.coordinates[time_moment])
+
+        return points_coord
+
+
 class Point:
     """
     Class of physical point (parts of the cord)
@@ -33,9 +48,9 @@ class Point:
         velocity - velocity on y axis
         number - number of point in the cord
         """
-        self.x = int(x) + SCREEN_WIDTH // 4
-        self.y = int(y) + SCREEN_HEIGHT // 2
-        self.velocity = int(y_velocity)
+        self.x = x + SCREEN_WIDTH // 4
+        self.y = y + SCREEN_HEIGHT // 2
+        self.velocity = y_velocity
         self.number = number
         self.coordinates = [(self.x, self.y)]
 
@@ -65,7 +80,9 @@ class Point:
         moves the point on y axis
         """
         self.y -= self.velocity * DELTA_TIME
-        self.coordinates.append((self.x, int(self.y)))
+
+    def make_a_record(self):
+        self.coordinates.append((self.x, self.y))
 
 
 class PhysicalSimulator(Simulator):
@@ -85,7 +102,7 @@ class PhysicalSimulator(Simulator):
             number = 0
             for data_string in points_file:
                 x, y, y_velocity = data_string.split()
-                point = Point(x, y, y_velocity, number)
+                point = Point(int(x), float(y), float(y_velocity), number)
                 self.points.append(point)
                 number += 1
 
@@ -106,6 +123,7 @@ class PhysicalSimulator(Simulator):
                                    self.points[point.number + 1].y,
                                    self.length_0)
                     point.move()
+                point.make_a_record()
 
     def draw(self, screen, drawing_step):
         """
@@ -116,14 +134,16 @@ class PhysicalSimulator(Simulator):
         screen.fill(WHITE)
         for point in self.points:
             if point.number != 0 and point.number != len(self.points) - 1:
+                x, y = point.coordinates[self.my_time]
                 pygame.draw.circle(screen,
                                    BLACK,
-                                   point.coordinates[self.my_time],
+                                   (x, int(y)),
                                    POINT_RADIUS)
             else:
+                x, y = point.coordinates[0]
                 pygame.draw.circle(screen,
                                    BLACK,
-                                   point.coordinates[0],
+                                   (x, int(y)),
                                    POINT_RADIUS)
         if self.my_time < CALC_NUMBER - drawing_step:
             self.my_time += drawing_step
@@ -141,33 +161,13 @@ def main():
 
     length_0 = create_init_params(amount_of_points, length, max_velocity)
 
-    phys_sim = PhysicalSimulator(10, length_0)
-    phys_sim.simulate()
+    print("1 - draw phys_sim, 2 - get coordinates in time: ")
+    act = int(input())
 
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    screen.fill(WHITE)
-
-    clock = pygame.time.Clock()
-    finished = False
-
-    while not finished:
-        clock.tick(FPS)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                finished = True
-            elif event.type == pygame.KEYDOWN:
-                key = event.key
-                if key == pygame.K_q or key == pygame.K_ESCAPE:
-                    finished = True
-
-        anim_is_ended = phys_sim.draw(screen, drawing_step)
-        if anim_is_ended:
-            finished = True
-    
-        pygame.display.set_caption(str(clock.get_fps()))
-
-        pygame.display.update()
+    if act == 1:
+        draw_phys_sim(length_0, drawing_step)
+    elif act == 2:
+        get_coord()
 
 
 def create_init_params(amount_of_points, length, max_velocity):
@@ -191,6 +191,47 @@ def create_init_params(amount_of_points, length, max_velocity):
             x += delta_r
 
     return delta_r // 400
+
+
+def draw_phys_sim(length_0, drawing_step):
+    phys_sim = PhysicalSimulator(10, length_0)
+    phys_sim.simulate()
+
+    pygame.init()
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    screen.fill(WHITE)
+
+    clock = pygame.time.Clock()
+    finished = False
+
+    while not finished:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finished = True
+            elif event.type == pygame.KEYDOWN:
+                key = event.key
+                if key == pygame.K_q or key == pygame.K_ESCAPE:
+                    finished = True
+
+        anim_is_ended = phys_sim.draw(screen, drawing_step)
+        if anim_is_ended:
+            finished = True
+
+        pygame.display.set_caption(str(clock.get_fps()))
+
+        pygame.display.update()
+
+
+def get_coord():
+    physical_simulation = PhysicalSimulation()
+
+    print("\nEnter time (int): ")
+    time = int(input())
+
+    coordinates = physical_simulation.get_points_at(time)
+
+    print(coordinates)
 
 
 if __name__ == "__main__":
