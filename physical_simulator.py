@@ -23,14 +23,12 @@ BLACK = (0, 0, 0)
 
 class PhysicalSimulation(Simulation):
 
+    def __init__(self, points):
+        self.points = points
+
     def get_points_at(self, time_moment: int) -> list:
-        length_0 = 2
-
-        phys_simulator = PhysicalSimulator(10, length_0)
-        phys_simulator.simulate()
-
         points_coord = []
-        for point in phys_simulator.points:
+        for point in self.points:
             points_coord.append(point.coordinates[time_moment])
 
         return points_coord
@@ -110,7 +108,9 @@ class PhysicalSimulator(Simulator):
         pass
 
     def get_simulation(self) -> Simulation:
-        pass
+        physical_simulation = PhysicalSimulation(self.points)
+
+        return physical_simulation
 
     def simulate(self):
         """simulates an interaction between all points of the cord"""
@@ -161,13 +161,17 @@ def main():
 
     length_0 = create_init_params(amount_of_points, length, max_velocity)
 
+    phys_sim = PhysicalSimulator(10, length_0)
+    phys_sim.simulate()
+    phys_simulation = phys_sim.get_simulation()
+
     print("1 - draw phys_sim, 2 - get coordinates in time: ")
     act = int(input())
 
     if act == 1:
-        draw_phys_sim(length_0, drawing_step)
+        draw_phys_sim(phys_sim, drawing_step)
     elif act == 2:
-        get_coord()
+        get_coord(phys_simulation)
 
 
 def create_init_params(amount_of_points, length, max_velocity):
@@ -193,10 +197,7 @@ def create_init_params(amount_of_points, length, max_velocity):
     return delta_r // 400
 
 
-def draw_phys_sim(length_0, drawing_step):
-    phys_sim = PhysicalSimulator(10, length_0)
-    phys_sim.simulate()
-
+def draw_phys_sim(phys_sim, drawing_step):
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.fill(WHITE)
@@ -223,15 +224,16 @@ def draw_phys_sim(length_0, drawing_step):
         pygame.display.update()
 
 
-def get_coord():
-    physical_simulation = PhysicalSimulation()
-
-    print("\nEnter time (int): ")
-    time = int(input())
-
-    coordinates = physical_simulation.get_points_at(time)
-
-    print(coordinates)
+def get_coord(physical_simulation):
+    finished = False
+    while not finished:
+        print("\nEnter time (int): {(-1) - exit}")
+        time_moment = int(input())
+        if time_moment != -1:
+            coordinates = physical_simulation.get_points_at(time_moment)
+            print(coordinates)
+        else:
+            finished = True
 
 
 if __name__ == "__main__":
