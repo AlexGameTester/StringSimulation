@@ -1,83 +1,153 @@
 from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
 
 calculating = None
 
 class StartParameters:
+    """Starting parameter which are set by the user.
+
+    speed_of_sound - speed of sound in a material of a string. Less or equal than 343
+    simulation_time - simulation modelling duration. Less or equal than 100
+    number of points - number of points in a string which will be modelled. Less or equal than 1000
+    precision - parameter which affects the step with which modelling will be done. Less or equal than 1000.
+    method - solution method of wave equation. Options: Fourier,
+
+    """
     
-    def __init__(self, density, simulation_time, tension):
-        self.density = density
+    def __init__(self, speed_of_sound, simulation_time, number_of_points, precision, method):
+        self.speed_of_sound = speed_of_sound
         self.simulation_time = simulation_time
-        self.tension = tension
-        self.data = [density, simulation_time, tension]
+        self.number_of_points = number_of_points
+        self.precision = precision
+        self.method = method
+        self.data = [speed_of_sound, simulation_time, number_of_points, precision, method]
 
     
 class InputWindow:
     """
     Represents a window that is displayed when the program is launched. User sets parameters in this window
     """
+    def exit1(self):
+        """
+        when pressed 'Quit' button shuts down the program.
+        """
+        Box_quit = messagebox.askquestion("Quit", "Are you sure you want to quit?")
+        if Box_quit == "yes":
+            App.destroy()
+        else:
+            pass
     
     def get_parameters(self) -> StartParameters:
         """
-        Reads data from the window and transforms it into a list of parameters
+        Reads data from the window, validates it and transforms it into a list of parameters
+        
         """
-        global calculating
+        text1 = self.sound_speed_entry.get()
+        text2 = self.simulation_time_entry.get()
+        text3 = self.points_entry.get()
+        text4 = self.precision_entry.get()
+        list_int = [text3, text4] 
+        list_real = [text1, text2]
 
-        if len(self.density_entry.get()) == 0:
-            density_double = 1
-        elif getdouble(self.density_entry.get()) < 0:
-            density_double = 2
-        else:
-            density_double = getdouble(self.density_entry.get())
         
-        if len(self.simulation_time_entry.get()) == 0:
-            simulation_time_double = 1
-        elif getdouble(self.simulation_time_entry.get()) < 0:
-            simulation_time_double = 2
-        else:
-            simulation_time_double = getdouble(self.simulation_time_entry.get())
-        
-        if len(self.tension_entry.get()) == 0:
-            tension_double = 1
-        elif getdouble(self.tension_entry.get()) < 0:
-            tension_double = 2
-        else:
-            tension_double = getdouble(self.tension_entry.get())
-        
-        c = StartParameters(density_double, simulation_time_double, tension_double)
-        
-        calculating = True
+        def check_int(s):
+            if len(s) == 0:
+                return "Blanked"
+            elif s[0] in ('-', '+'):
+                return s[1:].isdigit()
+            return s.isdigit()
 
-        Action2(c.data) 
+        int_check_list = [check_int(item) for item in list_int]
+
+
+        if len(text1) == 0 or len(text2) == 0 or len(text3) == 0 or len(text4) == 0:
+            Box1 = messagebox.askquestion("Validation Error: Blank fields", "text")
+            
+            if Box1 == "yes":
+                if len(text1) == 0:
+                    self.sound_speed_entry.insert(0, 1)
+                if len(text2) == 0:
+                    self.simulation_time_entry.insert(0, 1)
+                if len(text3) == 0:
+                    self.points_entry.insert(0, 1)
+                if len(text4) == 0:
+                    self.precision_entry.insert(0, 1)
+        elif any(item == False for item in [string.isnumeric() for string in list_int ]):
+            
+            messagebox.showerror("Non-numeric validation error", "Please check whether number of points and precision parameters are positive integers")
+        elif any(item<0 for item in [getdouble(item) for item in (list_int + list_real)]):
+            
+            messagebox.showerror("Negative value validation error", "Please check whether all values are positive")
+        elif any(item == False for item in int_check_list):
+            
+            messagebox.showerror("Non-integer value validation error", "Please check whether number of points and precision parameters are integers")
+        elif getint(self.points_entry.get()) > 1000:
+            
+            messagebox.showerror("Parameter is out of range", "Please check whether the number of points in a chain is less or equal than 1000")
+        elif getint(self.precision_entry.get()) > 1000:
+            
+            messagebox.showerror("Parameter is out of range", "Please check whether the precision parameter is less or equal than 1000")
+        elif getdouble(text1) > 343:
+            
+            messagebox.showerror("Parameter is out of range", "Please check whether the speed of sound in material is less than or equal than that in an air")
+        elif getdouble(text2) > 100:
+
+            messagebox.showerror("Parameter is out of range", "Please check whether the simulation time within the required range")
+        else:
+            c = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4), method=self.pick.get())
+            print(c.data)
+            Action2(c.data)
+            App.destroy()
         return c.data
-        
-        
+
+    
     def __init__(self, master, manager):
         self.manager = manager
         self.master = master
-        self.master.geometry('400x200')
+        self.master.geometry('400x250')
         self.master.resizable(width=False, height=False)
         
         center_frame = Frame(self.master)
         center_frame.pack(side=TOP)
         
-        self.label1 = Label(center_frame, text="Density")
+        method_options = ["Fourier method", "Method 2"]
+        self.pick = StringVar()
+        
+
+        self.label1 = Label(center_frame, text="Speed of sound in material")
         self.label1.grid(row=0, column=0, pady=5, padx=5)
-        self.density_entry = Entry(center_frame)
-        self.density_entry.grid(row=0, column=1, pady=5, padx=5)
+        self.sound_speed_entry = Entry(center_frame)
+        self.sound_speed_entry.grid(row=0, column=1, pady=5, padx=5)
 
         self.label2 = Label(center_frame, text="Simulation Time")
         self.label2.grid(row=1, column=0, pady=5, padx=5)
         self.simulation_time_entry = Entry(center_frame)
         self.simulation_time_entry.grid(row=1, column=1, pady=5, padx=5)
 
-        self.label3 = Label(center_frame, text="Tension")
+        self.label3 = Label(center_frame, text="Number of points in a chain")
         self.label3.grid(row=2, column=0, pady=5, padx=5)
-        self.tension_entry = Entry(center_frame)
-        self.tension_entry.grid(row=2, column=1, pady=5, padx=5)
+        self.points_entry = Entry(center_frame)
+        self.points_entry.grid(row=2, column=1, pady=5, padx=5)
+
+        self.label4 = Label(center_frame, text="Precision of modelling")
+        self.label4.grid(row=3, column=0, pady=5, padx=5)
+        self.precision_entry = Entry(center_frame)
+        self.precision_entry.grid(row=3, column=1, pady=5, padx=5)
+
+        self.label5 = Label(center_frame, text="Solution method")
+        self.label5.grid(row=4, column=0, pady=5, padx=5)
+        self.menu1 = ttk.Combobox(center_frame, value=method_options, textvariable=self.pick, state="readonly")
+        self.menu1.current(0)
+        self.menu1.grid(row=4, column=1, pady=5, padx=5)
 
         Button1 = Button(center_frame, command=self.get_parameters, width=10, 
                                         height=2, font=18, text="Start")
-        Button1.grid(row=3)
+        Button1.grid(row=5)
+
+        Button2 = Button(center_frame, command=self.exit1, width=4, height=1, font=18,
+                        text="Quit")
+        Button2.grid(row=5, column=1)
     
     
     def _close(self):
@@ -87,7 +157,7 @@ def Action2(x):
     print(x)
     print("buba")
     print("Input parameters are processing, please wait.")
-    print(calculating)
+    
 
     
 
@@ -97,7 +167,7 @@ def Action2(x):
 
 
 App = Tk()
+App.title("String Simulation")
 a = InputWindow(App, 1)
 a.__dict__
-print(a.__dict__)
 App.mainloop()
