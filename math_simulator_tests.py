@@ -1,19 +1,45 @@
+from calculations_manager import SimulationParameters
 from math_simulator import MathematicalSimulator
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import time
+import numpy as np
 
 if __name__ == "__main__":
-    math_sim = MathematicalSimulator(None)
+    initial_pos_x = np.linspace(0, 10, 2000)
+    # initial_pos_y = np.sin(3 * np.pi * initial_pos_x) + 8 * np.sin(12 * np.pi * initial_pos_x + 7/8 * np.pi)
+    initial_pos_y = initial_pos_x * 0
+    initial_pos_y[0] = 0
+    initial_pos_y[initial_pos_y.shape[0] - 1] = 0
+    initial_vel_y = initial_pos_x * 0
+    initial_vel_y[1000] = 18
 
-    finished = False
-    while not finished:
-        finished = math_sim._fourier_solver.calculate_next()
-    points_at = math_sim._fourier_solver.get_points_function()
-    x = math_sim._initial_positions_x
-    plt.plot(x, points_at(0.345))
-    plt.plot(x, points_at(8.345))
-    plt.plot(x, points_at(12.35))
+    number_of_points = 320
+
+    start = time.time_ns()
+    params = SimulationParameters(1000, 1, initial_pos_x, initial_pos_y, initial_vel_y, accuracy=1000,
+                                  number_of_points=number_of_points)
+    math_sim = MathematicalSimulator(params)
+    math_sim.simulate()
+    sim = math_sim.get_simulation()
+    end = time.time_ns()
+    print('Time of simulation is', (end - start)*1e-9, 'seconds.')
+
+    x = np.linspace(0, params.string_length, number_of_points)
+
+    fig, ax = plt.subplots()
+
+    line, = ax.plot(x, sim.get_points_at(0))
+
+    def animate(i):
+        line.set_ydata(sim.get_points_at(i))
+        return line,
+
+    ani = animation.FuncAnimation(
+        fig, animate, frames=np.array(range(1000)), blit=True)
+
     plt.show()
+
 
 
 
