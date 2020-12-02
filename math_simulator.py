@@ -30,7 +30,8 @@ class MathematicalSimulator(Simulator):
         """
         from calculations_manager import SimulationParameters
         if not isinstance(params, SimulationParameters):
-            raise TypeError()
+            raise TypeError("Expected <class 'calculations_manager.SimulationParameters'> for params, but got",
+                            type(params))
 
         self._string_length = params.string_length
         self._speed_of_sound = params.speed_of_sound
@@ -62,7 +63,7 @@ class MathematicalSimulator(Simulator):
 
     def simulate(self):
         """
-        Inital implementation of simulation process. **Blocks program execution**
+        Initial implementation of simulation process. **Blocks program execution**
         """
         finished = False
         while not finished:
