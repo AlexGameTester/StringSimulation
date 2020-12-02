@@ -62,7 +62,7 @@ class InputWindow:
 
 
         if len(text1) == 0 or len(text2) == 0 or len(text3) == 0 or len(text4) == 0:
-            Box1 = messagebox.askquestion("Validation Error: Blank fields", "text")
+            Box1 = messagebox.askquestion("Validation Error: Blank fields", "Some of the value inputs were left empty, Do you want to use standard values for those whichare missing?")
             
             if Box1 == "yes":
                 if len(text1) == 0:
