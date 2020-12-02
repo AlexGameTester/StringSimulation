@@ -23,7 +23,7 @@ class SimulationParameters:
         """Time period in seconds that is simulated"""
 
         assert speed_of_sound > 0
-        self.speed_of_light = speed_of_sound
+        self.speed_of_sound = speed_of_sound
         """Speed of sound in the string"""
 
         assert initial_positions_x.shape == initial_positions_y.shape == initial_velocities_y.shape
