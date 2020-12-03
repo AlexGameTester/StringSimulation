@@ -67,8 +67,7 @@ class CalculationsManager:
     """
     Controls process of simulation of the system
     """
-    fps = 400 # TODO: maybe put it somewhere else
-
+    fps = 400  # TODO: maybe put it somewhere else
 
     def __init__(self, manager, params: StartParameters):
         self.manager = manager
@@ -87,10 +86,12 @@ class CalculationsManager:
         sim_time = int(start_params.simulation_time * self.fps)
         # TODO: really read parameters here
         x = np.linspace(0, 300, 2000)
-        y = 25 * np.sin(3 * np.pi * x / 300 + 12 / 19 * np.pi)
+        y = 25 * np.sin(3 * np.pi * x / 300)
+        y[0] = 0
+        y[len(y) - 1] = 0
         y_ = x * 0
         return SimulationParameters(sim_time, start_params.speed_of_sound, x, y, y_, start_params.precision,
-                                    number_of_points=40)
+                                    number_of_points=start_params.number_of_points)
 
     def start_calculation(self):
         """

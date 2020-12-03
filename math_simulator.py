@@ -108,7 +108,8 @@ class FourierSolver:
         self.y_pos = y_pos
         self.y_vel = y_vel
         self.x = x
-        self.a = 1 / c
+        # TODO: Check whether it is c or 1/c
+        self.a = c
         self.length = length
         self.number = number
         self.number_of_points = y_pos.shape[0]
