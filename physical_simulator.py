@@ -11,7 +11,7 @@ SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 900
 FPS = 400
 
-POINT_RADIUS = 2
+POINT_RADIUS = 5
 CALC_NUMBER = 100000
 DELTA_TIME = 0.0001
 K = 600
@@ -91,16 +91,16 @@ class PhysicalSimulator(Simulator):
     def get_completion_percentage(self) -> float:
         pass
 
-    def __init__(self, params, length_0):
+    def __init__(self, params):
         super().__init__(params)
         self.points = []
         self.my_time = 0
-        self.length_0 = length_0
+        self.length_0 = 20 / params.number_of_points
         with open("physical_points.txt") as points_file:
             number = 0
             for data_string in points_file:
                 x, y, y_velocity = data_string.split()
-                point = Point(int(x), float(y), float(y_velocity), number)
+                point = Point(float(x), float(y), float(y_velocity), number)
                 self.points.append(point)
                 number += 1
 
@@ -137,13 +137,13 @@ class PhysicalSimulator(Simulator):
                 x, y = point.coordinates[self.my_time]
                 pygame.draw.circle(screen,
                                    BLACK,
-                                   (x, int(y)),
+                                   (int(x), int(y)),
                                    POINT_RADIUS)
             else:
                 x, y = point.coordinates[0]
                 pygame.draw.circle(screen,
                                    BLACK,
-                                   (x, int(y)),
+                                   (int(x), int(y)),
                                    POINT_RADIUS)
         if self.my_time < CALC_NUMBER - drawing_step:
             self.my_time += drawing_step
@@ -154,14 +154,17 @@ class PhysicalSimulator(Simulator):
 
 
 def main():
-    amount_of_points = 40
-    length = SCREEN_WIDTH // 2
-    max_velocity = 200
+    import calculations_manager
+    import inputwindow
+
     drawing_step = 30
 
-    length_0 = create_init_params(amount_of_points, length, max_velocity)
+    start_params = inputwindow.StartParameters(1, 100, 40, 1, 1)
+    calc_manager = calculations_manager.CalculationsManager(10, start_params)
 
-    phys_sim = PhysicalSimulator(10, length_0)
+    sim_params = calc_manager._get_simulation_parameters()
+
+    phys_sim = PhysicalSimulator(sim_params)
     phys_sim.simulate()
     phys_simulation = phys_sim.get_simulation()
 
@@ -188,8 +191,8 @@ def create_init_params(amount_of_points, length, max_velocity):
     y = 0
     with open("physical_points.txt", "w") as points:
         for i in range(amount_of_points):
-            velocity = int(max_velocity * (math.sin(2 * math.pi * i / amount_of_points) +
-                                           math.sin(1 * math.pi * i / amount_of_points)))
+            velocity = int(max_velocity * (math.sin(3 * math.pi * i / amount_of_points) +
+                                           math.sin(12 * math.pi * i / amount_of_points)))
             point = str(x) + " " + str(y) + " " + str(velocity) + "\n"
             points.write(point)
 
