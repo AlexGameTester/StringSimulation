@@ -10,7 +10,7 @@ class SimulationParameters:
     Represents a list of parameters that is set by CalculationsManager and given to simulators
     """
 
-    def __init__(self, simulation_time: float,
+    def __init__(self, simulation_time: int,
                  speed_of_sound: float,
                  initial_positions_x: np.ndarray,
                  initial_positions_y: np.ndarray,
@@ -20,10 +20,10 @@ class SimulationParameters:
                  **kwargs):
         assert simulation_time > 0
         self.simulation_time = simulation_time
-        """Time period in seconds that is simulated"""
+        """Time period in frames that is simulated"""
 
         assert speed_of_sound > 0
-        self.speed_of_light = speed_of_sound
+        self.speed_of_sound = speed_of_sound
         """Speed of sound in the string"""
 
         assert initial_positions_x.shape == initial_positions_y.shape == initial_velocities_y.shape
@@ -47,7 +47,7 @@ class SimulationParameters:
         if 'string_length' in kwargs.keys():
             self.string_length = kwargs['string_length']
         else:
-            string_length = abs(initial_positions_x[0] - initial_positions_x[len(initial_positions_x)])
+            string_length = abs(initial_positions_x[0] - initial_positions_x[len(initial_positions_x) - 1])
             self.string_length = string_length
 
 

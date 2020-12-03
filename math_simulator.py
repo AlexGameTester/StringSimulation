@@ -6,6 +6,14 @@ from simulator import Simulator
 import numpy as np
 
 
+class MathSimulation(Simulation):
+    def __init__(self, points):
+        self.points = points
+
+    def get_points_at(self, time: int) -> np.ndarray:
+        return self.points[time]
+
+
 class MathematicalSimulator(Simulator):
     """
     Represents a mathematical way to simulate the process
@@ -20,35 +28,53 @@ class MathematicalSimulator(Simulator):
 
         :param params: a SimulationParameters instance
         """
-        # TODO: Specific way to get this values will be written later
-        # assert params
+        from calculations_manager import SimulationParameters
+        if not isinstance(params, SimulationParameters):
+            raise TypeError("Expected <class 'calculations_manager.SimulationParameters'> for params, but got",
+                            type(params))
 
-        self._string_length = 10
-        self._speed_of_sound = 20
-        assert self._string_length > 0
-        assert self._speed_of_sound > 0
-        self._initial_positions_x = np.linspace(0, self._string_length, 2000)
-        self._initial_positions_y = np.sin(6 * np.pi / self._string_length * self._initial_positions_x)
-        assert len(self._initial_positions_x.shape) == 1
-        assert len(self._initial_positions_y.shape) == 1
-        assert self._initial_positions_x.shape == self._initial_positions_y.shape
-        self._initial_velocities_y = np.zeros(2000)
-        # self._number_of_points = 5000
-        # TODO: probably add data interpolation to given number of points
+        self._string_length = params.string_length
+        self._speed_of_sound = params.speed_of_sound
+        self._initial_positions_x = params.initial_positions_x
+        self._initial_positions_y = params.initial_positions_y
+        self._initial_velocities_y = params.initial_velocities_y
+        self._simulation_time = params.simulation_time
+        self._number_of_points = params.number_of_points
+        self._apply_accuracy(params.accuracy, self._initial_positions_x.shape[0])
 
-        number = 1600
         self._fourier_solver = FourierSolver(self._initial_positions_y, self._initial_velocities_y,
                                              self._initial_positions_x, self._speed_of_sound,
-                                             self._string_length, number)
+                                             self._string_length, self._fourier_sum_elements_number)
+
+        self._calculated_points = []
+
+    def _apply_accuracy(self, accuracy: int, start_points_number: int):
+        min_fourier_sum_elements_number = 12
+        accuracy_divider = 3000
+        self._fourier_sum_elements_number = int(min_fourier_sum_elements_number \
+                                            + accuracy / accuracy_divider * start_points_number)
+        print('Number of sum elements is', self._fourier_sum_elements_number)
 
     def _method(self):
         pass
 
-    def get_method(self) -> Callable[[float], None]:
+    def get_method(self) -> Callable[[None], None]:
         pass
 
+    def simulate(self):
+        """
+        Initial implementation of simulation process. **Blocks program execution**
+        """
+        finished = False
+        while not finished:
+            finished = self._fourier_solver.calculate_next()
+        points_at = self._fourier_solver.get_points_function()
+
+        for i in range(self._simulation_time):
+            self._calculated_points.append(points_at(i, self._number_of_points))
+
     def get_simulation(self) -> Simulation:
-        pass
+        return MathSimulation(self._calculated_points)
 
 
 class FourierSolver:
@@ -130,7 +156,7 @@ class FourierSolver:
 
         return False
 
-    def get_points_function(self) -> Callable[[float], np.ndarray]:
+    def get_points_function(self) -> Callable[[float, int], np.ndarray]:
         """
         Gives a function that returns points positions at some time
 
@@ -142,22 +168,25 @@ class FourierSolver:
         assert self._k >= self.number, "Calculation isn't finished"
 
         number = self.number
-        number_of_points = self.number_of_points
-        x = self.x
         a = self.a
         length = self.length
         cos_coefficients = np.array(self._cos_coefficients)
         sin_coefficients = np.array(self._sin_coefficients)
 
-        def points_at(time: float):
+        def points_at(time: float, number_of_points: int):
+            assert number_of_points > 0
             k_vals = np.array(range(number)) + 1
 
+            x = np.linspace(0, self.length, number_of_points)
+
             # TODO: check this code somehow
-            cos_sum_time_part = np.tile(cos_coefficients * np.cos(k_vals * np.pi * a * time / length), (number_of_points, 1))
+            cos_sum_time_part = np.tile(cos_coefficients * np.cos(k_vals * np.pi * a * time / length),
+                                        (number_of_points, 1))
             cos_sum_part = cos_sum_time_part * np.sin(np.pi / length * np.tensordot(x, k_vals, axes=0))
             cos_part = np.sum(cos_sum_part, 1)
 
-            sin_sum_time_part = np.tile(sin_coefficients * np.sin(k_vals * np.pi * a * time / length), (number_of_points, 1))
+            sin_sum_time_part = np.tile(sin_coefficients * np.sin(k_vals * np.pi * a * time / length),
+                                        (number_of_points, 1))
             sin_sum_part = sin_sum_time_part * np.sin(np.pi / length * np.tensordot(x, k_vals, axes=0))
             sin_part = np.sum(sin_sum_part, 1)
 
