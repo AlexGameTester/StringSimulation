@@ -4,17 +4,18 @@ from tkinter import messagebox
 
 calculating = None
 
+
 class StartParameters:
     """Starting parameter which are set by the user.
 
-    speed_of_sound - speed of sound in a material of a string. Less or equal than 343
-    simulation_time - simulation modelling duration. Less or equal than 100
-    number of points - number of points in a string which will be modelled. Less or equal than 1000
-    precision - parameter which affects the step with which modelling will be done. Less or equal than 1000.
-    method - solution method of wave equation. Options: Fourier,
+    :param speed_of_sound: speed of sound in a material of a string. Less or equal than 343
+    :param simulation_time: simulation modelling duration. Less or equal than 100
+    :param number_of_points: number of points in a string which will be modelled. Less or equal than 1000
+    :param precision: parameter which affects the step with which modelling will be done. Less or equal than 1000.
+    :param method: solution method of wave equation. Options: Fourier,
 
     """
-    
+
     def __init__(self, speed_of_sound, simulation_time, number_of_points, precision, method):
         self.speed_of_sound = speed_of_sound
         self.simulation_time = simulation_time
@@ -23,11 +24,12 @@ class StartParameters:
         self.method = method
         self.data = [speed_of_sound, simulation_time, number_of_points, precision, method]
 
-    
+
 class InputWindow:
     """
     Represents a window that is displayed when the program is launched. User sets parameters in this window
     """
+
     def exit1(self):
         """
         when pressed 'Quit' button shuts down the program.
@@ -37,20 +39,18 @@ class InputWindow:
             App.destroy()
         else:
             pass
-    
+
     def get_parameters(self) -> StartParameters:
         """
         Reads data from the window, validates it and transforms it into a list of parameters
-        
         """
         text1 = self.sound_speed_entry.get()
         text2 = self.simulation_time_entry.get()
         text3 = self.points_entry.get()
         text4 = self.precision_entry.get()
-        list_int = [text3, text4] 
+        list_int = [text3, text4]
         list_real = [text1, text2]
 
-        
         def check_int(s):
             if len(s) == 0:
                 return "Blanked"
@@ -60,10 +60,10 @@ class InputWindow:
 
         int_check_list = [check_int(item) for item in list_int]
 
-
         if len(text1) == 0 or len(text2) == 0 or len(text3) == 0 or len(text4) == 0:
-            Box1 = messagebox.askquestion("Validation Error: Blank fields", "Some of the value inputs were left empty, Do you want to use standard values for those whichare missing?")
-            
+            Box1 = messagebox.askquestion("Validation Error: Blank fields",
+                                          "Some of the value inputs were left empty, Do you want to use standard values for those whichare missing?")
+
             if Box1 == "yes":
                 if len(text1) == 0:
                     self.sound_speed_entry.insert(0, 1)
@@ -73,47 +73,52 @@ class InputWindow:
                     self.points_entry.insert(0, 1)
                 if len(text4) == 0:
                     self.precision_entry.insert(0, 1)
-        elif any(item == False for item in [string.isnumeric() for string in list_int ]):
-            
-            messagebox.showerror("Non-numeric validation error", "Please check whether number of points and precision parameters are positive integers")
-        elif any(item<0 for item in [getdouble(item) for item in (list_int + list_real)]):
-            
+        elif any(item == False for item in [string.isnumeric() for string in list_int]):
+
+            messagebox.showerror("Non-numeric validation error",
+                                 "Please check whether number of points and precision parameters are positive integers")
+        elif any(item < 0 for item in [getdouble(item) for item in (list_int + list_real)]):
+
             messagebox.showerror("Negative value validation error", "Please check whether all values are positive")
         elif any(item == False for item in int_check_list):
-            
-            messagebox.showerror("Non-integer value validation error", "Please check whether number of points and precision parameters are integers")
+
+            messagebox.showerror("Non-integer value validation error",
+                                 "Please check whether number of points and precision parameters are integers")
         elif getint(self.points_entry.get()) > 1000:
-            
-            messagebox.showerror("Parameter is out of range", "Please check whether the number of points in a chain is less or equal than 1000")
+
+            messagebox.showerror("Parameter is out of range",
+                                 "Please check whether the number of points in a chain is less or equal than 1000")
         elif getint(self.precision_entry.get()) > 1000:
-            
-            messagebox.showerror("Parameter is out of range", "Please check whether the precision parameter is less or equal than 1000")
+
+            messagebox.showerror("Parameter is out of range",
+                                 "Please check whether the precision parameter is less or equal than 1000")
         elif getdouble(text1) > 343:
-            
-            messagebox.showerror("Parameter is out of range", "Please check whether the speed of sound in material is less than or equal than that in an air")
+
+            messagebox.showerror("Parameter is out of range",
+                                 "Please check whether the speed of sound in material is less than or equal than that in an air")
         elif getdouble(text2) > 100:
 
-            messagebox.showerror("Parameter is out of range", "Please check whether the simulation time within the required range")
+            messagebox.showerror("Parameter is out of range",
+                                 "Please check whether the simulation time within the required range")
         else:
-            c = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4), method=self.pick.get())
+            c = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4),
+                                method=self.pick.get())
             print(c.data)
             Action2(c.data)
             App.destroy()
         return c.data
 
-    
     def __init__(self, master, manager):
         self.manager = manager
         self.master = master
         self.master.geometry('400x250')
         self.master.resizable(width=False, height=False)
-        
+
         center_frame = Frame(self.master)
         center_frame.pack(side=TOP)
-        
+
         method_options = ["Fourier method", "Method 2"]
         self.pick = StringVar()
-        
 
         self.label1 = Label(center_frame, text="Speed of sound in material")
         self.label1.grid(row=0, column=0, pady=5, padx=5)
@@ -141,29 +146,22 @@ class InputWindow:
         self.menu1.current(0)
         self.menu1.grid(row=4, column=1, pady=5, padx=5)
 
-        Button1 = Button(center_frame, command=self.get_parameters, width=10, 
-                                        height=2, font=18, text="Start")
+        Button1 = Button(center_frame, command=self.get_parameters, width=10,
+                         height=2, font=18, text="Start")
         Button1.grid(row=5)
 
         Button2 = Button(center_frame, command=self.exit1, width=4, height=1, font=18,
-                        text="Quit")
+                         text="Quit")
         Button2.grid(row=5, column=1)
-    
-    
+
     def _close(self):
         pass
-        
+
+
 def Action2(x):
     print(x)
     print("buba")
     print("Input parameters are processing, please wait.")
-    
-
-    
-
-        
-
-
 
 
 App = Tk()
