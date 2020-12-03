@@ -1,4 +1,4 @@
-from inputwindow import StartParameters
+from inputwindow import StartParameters, InputWindow
 from simulation import Simulation
 
 
@@ -14,17 +14,20 @@ class Manager:
         """
         Starts execution of the program
         """
-        pass
+        self._input_window = InputWindow(self)
 
-    def start_calculation(self, params: StartParameters):
+    def start_calculation(self, params: StartParameters, close_function):
         """
         Starts calculation of solutions
 
+        :param close_function: a function called to close InputWindow to avoid cyclic references
         :param params: a set of parameters set by user
         """
         assert params
 
         self._start_parameters = params
+        print('Starting calculation')
+        close_function()
 
     def set_simulations(self, math_simulation: Simulation, phys_simulation: Simulation) -> None:
         """
@@ -38,6 +41,7 @@ class Manager:
 
         self._physical_simulation = phys_simulation
         self._mathematical_simulation = math_simulation
+
 
     def on_calculation_ended(self) -> None:
         """

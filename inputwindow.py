@@ -34,7 +34,7 @@ class InputWindow:
         """
         box_quit = messagebox.askquestion("Quit", "Are you sure you want to quit?")
         if box_quit == "yes":
-            App.destroy()
+            self._close()
         else:
             pass
 
@@ -103,18 +103,18 @@ class InputWindow:
         else:
             c = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4),
                                 method=self.pick.get())
-            print(c.data)
-            Action2(c.data)
-            App.destroy()
             return c
 
-    def __init__(self, master, manager):
+    def __init__(self, manager):
         self.manager = manager
-        self.master = master
-        self.master.geometry('400x250')
-        self.master.resizable(width=False, height=False)
 
-        center_frame = Frame(self.master)
+        app = Tk()
+        app.title("String Simulation")
+        self.app = app
+        self.app.geometry('400x250')
+        self.app.resizable(width=False, height=False)
+
+        center_frame = Frame(self.app)
         center_frame.pack(side=TOP)
 
         method_options = ["Fourier method", "Method 2"]
@@ -146,7 +146,7 @@ class InputWindow:
         self.menu1.current(0)
         self.menu1.grid(row=4, column=1, pady=5, padx=5)
 
-        button1 = Button(center_frame, command=self.get_parameters, width=10,
+        button1 = Button(center_frame, command=self._start, width=10,
                          height=2, font=18, text="Start")
         button1.grid(row=5)
 
@@ -154,18 +154,14 @@ class InputWindow:
                          text="Quit")
         button2.grid(row=5, column=1)
 
+        app.mainloop()
+
+    def _start(self):
+        params = self.get_parameters()
+
+        if params:
+            self.manager.start_calculation(params, self._close)
+
     def _close(self):
-        pass
-
-
-def Action2(x):
-    print(x)
-    print("buba")
-    print("Input parameters are processing, please wait.")
-
-
-App = Tk()
-App.title("String Simulation")
-a = InputWindow(App, 0)
-a.__dict__
-App.mainloop()
+        self.app.destroy()
+        self.manager = None
