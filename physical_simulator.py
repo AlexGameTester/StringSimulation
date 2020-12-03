@@ -11,8 +11,8 @@ SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 900
 FPS = 400
 
-POINT_RADIUS = 5
-CALC_NUMBER = 400000
+POINT_RADIUS = 2
+CALC_NUMBER = 100000
 DELTA_TIME = 0.0001
 K = 600
 M = 1
@@ -188,7 +188,8 @@ def create_init_params(amount_of_points, length, max_velocity):
     y = 0
     with open("physical_points.txt", "w") as points:
         for i in range(amount_of_points):
-            velocity = int(max_velocity * math.sin(2 * math.pi * i / amount_of_points))
+            velocity = int(max_velocity * (math.sin(3 * math.pi * i / amount_of_points) +
+                                           math.sin(12 * math.pi * i / amount_of_points)))
             point = str(x) + " " + str(y) + " " + str(velocity) + "\n"
             points.write(point)
 

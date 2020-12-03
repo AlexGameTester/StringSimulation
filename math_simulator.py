@@ -5,13 +5,15 @@ from simulator import Simulator
 
 import numpy as np
 
+FPS = 400
+
 
 class MathSimulation(Simulation):
     def __init__(self, points):
         self.points = points
 
     def get_points_at(self, time: int) -> np.ndarray:
-        return self.points[time]
+        return self.points[time // FPS]
 
 
 class MathematicalSimulator(Simulator):
