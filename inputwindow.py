@@ -100,6 +100,10 @@ class InputWindow:
 
             messagebox.showerror("Non-integer value validation error",
                                  "Please check whether number of points and precision parameters are integers")
+        elif any(len(item)>10 for item in (list_int + list_real)):
+
+            messagebox.showerror("Character limit",
+                                 "Please check whether maximal number of characters in each field is less than or equal to 10")
         elif getint(self.points_entry.get()) > 1000:
 
             messagebox.showerror("Parameter is out of range",
