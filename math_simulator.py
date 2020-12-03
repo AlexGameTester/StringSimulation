@@ -190,6 +190,7 @@ class FourierSolver:
             sin_sum_part = sin_sum_time_part * np.sin(np.pi / length * np.tensordot(x, k_vals, axes=0))
             sin_part = np.sum(sin_sum_part, 1)
 
-            return cos_part + sin_part
+            y = cos_part + sin_part
+            return list(zip(x, y))
 
         return points_at

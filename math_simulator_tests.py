@@ -17,13 +17,16 @@ if __name__ == "__main__":
     number_of_points = 320
 
     start = time.time_ns()
-    params = SimulationParameters(1000, 1, initial_pos_x, initial_pos_y, initial_vel_y, accuracy=1000,
+    params = SimulationParameters(1000, 1, initial_pos_x, initial_pos_y, initial_vel_y, accuracy=5,
                                   number_of_points=number_of_points)
     math_sim = MathematicalSimulator(params)
     math_sim.simulate()
     sim = math_sim.get_simulation()
     end = time.time_ns()
     print('Time of simulation is', (end - start)*1e-9, 'seconds.')
+    print(sim.get_points_at(20)[:18])
+
+    """
 
     x = np.linspace(0, params.string_length, number_of_points)
 
@@ -39,6 +42,7 @@ if __name__ == "__main__":
         fig, animate, frames=np.array(range(1000)), blit=True)
 
     plt.show()
+    """
 
 
 
