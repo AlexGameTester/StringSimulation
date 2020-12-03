@@ -2,8 +2,6 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 
-calculating = None
-
 
 class StartParameters:
     """Starting parameter which are set by the user.
@@ -34,8 +32,8 @@ class InputWindow:
         """
         when pressed 'Quit' button shuts down the program.
         """
-        Box_quit = messagebox.askquestion("Quit", "Are you sure you want to quit?")
-        if Box_quit == "yes":
+        box_quit = messagebox.askquestion("Quit", "Are you sure you want to quit?")
+        if box_quit == "yes":
             App.destroy()
         else:
             pass
@@ -60,11 +58,12 @@ class InputWindow:
 
         int_check_list = [check_int(item) for item in list_int]
 
-        if len(text1) == 0 or len(text2) == 0 or len(text3) == 0 or len(text4) == 0:
-            Box1 = messagebox.askquestion("Validation Error: Blank fields",
-                                          "Some of the value inputs were left empty, Do you want to use standard values for those whichare missing?")
+        if not all([text1, text2, text3, text4]):
+            box1 = messagebox.askquestion("Validation Error: Blank fields",
+                                          "Some of the value inputs were left empty, Do you want to use standard "
+                                          "values for those which are missing?")
 
-            if Box1 == "yes":
+            if box1 == "yes":
                 if len(text1) == 0:
                     self.sound_speed_entry.insert(0, 1)
                 if len(text2) == 0:
@@ -73,14 +72,15 @@ class InputWindow:
                     self.points_entry.insert(0, 1)
                 if len(text4) == 0:
                     self.precision_entry.insert(0, 1)
-        elif any(item == False for item in [string.isnumeric() for string in list_int]):
+
+        elif not all([string.isnumeric() for string in list_int]):
 
             messagebox.showerror("Non-numeric validation error",
                                  "Please check whether number of points and precision parameters are positive integers")
-        elif any(item < 0 for item in [getdouble(item) for item in (list_int + list_real)]):
+        elif any([getdouble(item) < 0 for item in (list_int + list_real)]):
 
             messagebox.showerror("Negative value validation error", "Please check whether all values are positive")
-        elif any(item == False for item in int_check_list):
+        elif not all(item for item in int_check_list):
 
             messagebox.showerror("Non-integer value validation error",
                                  "Please check whether number of points and precision parameters are integers")
@@ -106,7 +106,7 @@ class InputWindow:
             print(c.data)
             Action2(c.data)
             App.destroy()
-        return c.data
+            return c
 
     def __init__(self, master, manager):
         self.manager = manager
@@ -146,13 +146,13 @@ class InputWindow:
         self.menu1.current(0)
         self.menu1.grid(row=4, column=1, pady=5, padx=5)
 
-        Button1 = Button(center_frame, command=self.get_parameters, width=10,
+        button1 = Button(center_frame, command=self.get_parameters, width=10,
                          height=2, font=18, text="Start")
-        Button1.grid(row=5)
+        button1.grid(row=5)
 
-        Button2 = Button(center_frame, command=self.exit1, width=4, height=1, font=18,
+        button2 = Button(center_frame, command=self.exit1, width=4, height=1, font=18,
                          text="Quit")
-        Button2.grid(row=5, column=1)
+        button2.grid(row=5, column=1)
 
     def _close(self):
         pass
@@ -166,6 +166,6 @@ def Action2(x):
 
 App = Tk()
 App.title("String Simulation")
-a = InputWindow(App, 1)
+a = InputWindow(App, 0)
 a.__dict__
 App.mainloop()
