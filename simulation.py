@@ -9,7 +9,7 @@ class Simulation(ABC):
     """
 
     @abstractmethod
-    def get_points_at(self, time: float) -> np.ndarray:
+    def get_points_at(self, time: int) -> list:
         """
         Returns a numpy array of y-coordinates of points **in consecutive order**
          that represents a string at specific moment of time
