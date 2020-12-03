@@ -1,4 +1,6 @@
+from calculations_manager import CalculationsManager
 from inputwindow import StartParameters, InputWindow
+from output_manager import OutputManager
 from simulation import Simulation
 
 
@@ -9,6 +11,8 @@ class Manager:
         self._start_parameters = None
         self._mathematical_simulation = None
         self._physical_simulation = None
+        self._calculations_manager = None
+        self._output_manager = None
 
     def start(self):
         """
@@ -29,6 +33,9 @@ class Manager:
         print('Starting calculation')
         close_function()
 
+        self._calculations_manager = CalculationsManager(self, self._start_parameters)
+        self._calculations_manager.start_calculation()
+
     def set_simulations(self, math_simulation: Simulation, phys_simulation: Simulation) -> None:
         """
         Saves simulation of some type into manager
@@ -42,12 +49,17 @@ class Manager:
         self._physical_simulation = phys_simulation
         self._mathematical_simulation = math_simulation
 
-
-    def on_calculation_ended(self) -> None:
+    def on_calculation_ended(self):
         """
         Called (by CalculationsManager) when calculation of simulation is ended
         """
-        pass
+        assert self._mathematical_simulation
+        assert self._physical_simulation
+        print('Called')
+
+        self._output_manager = OutputManager(self, self._mathematical_simulation, self._physical_simulation)
+
+        self._output_manager.start_animation()
 
     def start_output(self):
         """

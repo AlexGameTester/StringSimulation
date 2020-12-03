@@ -67,6 +67,9 @@ class CalculationsManager:
     """
     Controls process of simulation of the system
     """
+    fps = 400 # TODO: maybe put it somewhere else
+
+
     def __init__(self, manager, params: StartParameters):
         self.manager = manager
         self.start_parameters = params
@@ -79,18 +82,40 @@ class CalculationsManager:
 
         :return: a SimulationParameters instance with set parameters
         """
-        pass
+        start_params = self.start_parameters
+
+        sim_time = int(start_params.simulation_time * self.fps)
+        # TODO: really read parameters here
+        x = np.linspace(0, 300, 2000)
+        y = 25 * np.sin(3 * np.pi * x / 300 + 12 / 19 * np.pi)
+        y_ = x * 0
+        return SimulationParameters(sim_time, start_params.speed_of_sound, x, y, y_, start_params.precision,
+                                    number_of_points=40)
 
     def start_calculation(self):
         """
         Prepares to start of calculation and starts a calculation cycle
         """
+        def make_phys():
+            """
+            Temporary method to make physical simulator
+            :return:
+            """
+            from physical_simulator import create_init_params
+            amount_of_points = 5
+            length = 900 // 2
+            max_velocity = 200
+            length_0 = create_init_params(amount_of_points, length, max_velocity)
+            return PhysicalSimulator(10, length_0)
+
         sim_params = self._get_simulation_parameters()
-        self._physical_simulator = PhysicalSimulator(sim_params)
+        self._physical_simulator = make_phys()
         self._mathematical_simulator = MathematicalSimulator(sim_params)
 
-    def _do_cycle(self):
-        pass
+        self._physical_simulator.simulate()
+        self._mathematical_simulator.simulate()
+
+        self._end_calculation()
 
     def _show_progress_bar(self):
         pass

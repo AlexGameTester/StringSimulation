@@ -12,7 +12,9 @@ class OutputManager:
         self.manager = manager
         self._math_simulation = math_simulation
         self._phys_simulation = phys_simulation
-        self._animation_window = AnimationWindow(self, math_simulation=math_simulation, phys_simulation=phys_simulation)
+        print(math_simulation)
+        print(phys_simulation)
+        self._animation_window = AnimationWindow(math_simulation=math_simulation, phys_simulation=phys_simulation)
 
     def start_animation(self):
         """
