@@ -38,6 +38,13 @@ class InputWindow:
         else:
             pass
 
+    def onValidate(self, i):
+        if getdouble(i) > 7:
+            self.master.bell()
+            return False
+        else:
+            return True
+    
     def get_parameters(self) -> StartParameters:
         """
         Reads data from the window, validates it and transforms it into a list of parameters
@@ -134,6 +141,8 @@ class InputWindow:
         self.master.geometry('400x250')
         self.master.resizable(width=False, height=False)
 
+        validate_command = (self.master.register(self.onValidate), '%i')
+
         center_frame = Frame(self.master)
         center_frame.pack(side=TOP)
 
@@ -142,22 +151,26 @@ class InputWindow:
 
         self.label1 = Label(center_frame, text="Speed of sound in material")
         self.label1.grid(row=0, column=0, pady=5, padx=5)
-        self.sound_speed_entry = Entry(center_frame)
+        self.sound_speed_entry = Entry(center_frame, validatecommand=validate_command, validate="key")
+        self.sound_speed_entry.insert(0, "1")
         self.sound_speed_entry.grid(row=0, column=1, pady=5, padx=5)
 
         self.label2 = Label(center_frame, text="Simulation Time")
         self.label2.grid(row=1, column=0, pady=5, padx=5)
-        self.simulation_time_entry = Entry(center_frame)
+        self.simulation_time_entry = Entry(center_frame, validatecommand=validate_command, validate="key")
+        self.simulation_time_entry.insert(0, "1")
         self.simulation_time_entry.grid(row=1, column=1, pady=5, padx=5)
 
         self.label3 = Label(center_frame, text="Number of points in a chain")
         self.label3.grid(row=2, column=0, pady=5, padx=5)
-        self.points_entry = Entry(center_frame)
+        self.points_entry = Entry(center_frame, validatecommand=validate_command, validate="key")
+        self.points_entry.insert(0, "1")
         self.points_entry.grid(row=2, column=1, pady=5, padx=5)
 
         self.label4 = Label(center_frame, text="Precision of modelling")
         self.label4.grid(row=3, column=0, pady=5, padx=5)
-        self.precision_entry = Entry(center_frame)
+        self.precision_entry = Entry(center_frame, validatecommand=validate_command, validate="key")
+        self.precision_entry.insert(0, "1")
         self.precision_entry.grid(row=3, column=1, pady=5, padx=5)
 
         self.label5 = Label(center_frame, text="Solution method")
