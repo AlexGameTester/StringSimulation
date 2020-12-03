@@ -103,11 +103,11 @@ class CalculationsManager:
             :return:
             """
             from physical_simulator import create_init_params
-            amount_of_points = 5
+            amount_of_points = sim_params.number_of_points
             length = 900 // 2
             max_velocity = 200
             length_0 = create_init_params(amount_of_points, length, max_velocity)
-            return PhysicalSimulator(10, length_0)
+            return PhysicalSimulator(sim_params, length_0)
 
         sim_params = self._get_simulation_parameters()
         self._physical_simulator = make_phys()
