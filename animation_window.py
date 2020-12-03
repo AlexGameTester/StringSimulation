@@ -1,9 +1,11 @@
 import time
 
 import pygame
+import numpy as np
 
 import math_simulator
 import physical_simulator
+import calculations_manager
 
 SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 900
@@ -54,10 +56,10 @@ class AnimationWindow:
 
             if self.animation_time < physical_simulator.CALC_NUMBER - DRAWING_STEP:
                 phys_points_coord = self._phys_simulation.get_points_at(self.animation_time)
-                # math_points_coord = self._math_simulation.get_points_at(self.animation_time)
-                math_points_coord = [(20, 20), (40, 40), (60, 60), (100, 100), (200, 200), (600, 600)]
-                points_coordinates = [phys_points_coord, math_points_coord]
-                draw_points(screen, points_coordinates)
+                math_points_coord = self._math_simulation.get_points_at(self.animation_time)
+                # math_points_coord = [(20, 20), (40, 40), (60, 60), (100, 100), (200, 200), (600, 600)]
+                # points_coordinates = [phys_points_coord, math_points_coord]
+                draw_points(screen, phys_points_coord, math_points_coord)
 
                 self.animation_time += DRAWING_STEP
             else:
@@ -70,7 +72,10 @@ class AnimationWindow:
 
 
 def main():
-    math_simulation = math_simulator.MathematicalSimulator
+    params = get_params()
+    math_sim = math_simulator.MathematicalSimulator(params)
+    math_sim.simulate()
+    math_simulation = math_sim.get_simulation()
 
     phys_sim = physical_simulator.PhysicalSimulator(10, 1)
     phys_sim.simulate()
@@ -80,16 +85,40 @@ def main():
     animation.start_animation()
 
 
-def draw_points(screen, points_coordinates):
+def get_params():
+    initial_pos_x = np.linspace(0, SCREEN_WIDTH // 2, 2000)
+    initial_pos_y = 30e5 * np.sin(3 * np.pi * initial_pos_x) + 30e5 * np.sin(12 * np.pi * initial_pos_x + 7/8 * np.pi)
+    # initial_pos_y = initial_pos_x * 0
+    initial_pos_y[0] = 0
+    initial_pos_y[initial_pos_y.shape[0] - 1] = 0
+    initial_vel_y = initial_pos_x * 0
+    # initial_vel_y[1000] = 18
+
+    number_of_points = 40
+
+    params = calculations_manager.SimulationParameters(1000, 1/3, initial_pos_x, initial_pos_y, initial_vel_y, accuracy=5,
+                                                       number_of_points=number_of_points)
+
+    return params
+
+
+def draw_points(screen, phys_points_coord, math_points_coord):
     screen.fill(WHITE)
-    for set_number, points_set in enumerate(points_coordinates):
-        points_color = POINTS_COLORS[set_number]
-        for point_number, point in enumerate(points_set):
-            x, y = point
-            pygame.draw.circle(screen,
-                               points_color,
-                               (x, int(y)),
-                               POINT_RADIUS)
+    for point in phys_points_coord:
+        points_color = POINTS_COLORS[0]
+        x, y = point
+        pygame.draw.circle(screen,
+                           points_color,
+                           (int(x), int(y)),
+                           POINT_RADIUS)
+
+    for point in math_points_coord:
+        points_color = POINTS_COLORS[1]
+        x, y = point
+        pygame.draw.circle(screen,
+                           points_color,
+                           (int(x + SCREEN_WIDTH // 4), int(y) + SCREEN_HEIGHT // 2),
+                           POINT_RADIUS)
 
 
 if __name__ == "__main__":
