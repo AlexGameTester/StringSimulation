@@ -55,8 +55,20 @@ class InputWindow:
             elif s[0] in ('-', '+'):
                 return s[1:].isdigit()
             return s.isdigit()
+        
+        def check_whether_real(s):
+            res_str = s.replace('.', '', 1)
+            if len(s) == 0:
+                return "Blanked"
+            elif s[0].isnumeric() == False:
+                return False
+            elif res_str.isnumeric() == False:
+                return False
+            else:
+                return True
 
         int_check_list = [check_int(item) for item in list_int]
+        real_check_list = [check_whether_real(item) for item in list_real]
 
         if not all([text1, text2, text3, text4]):
             box1 = messagebox.askquestion("Validation Error: Blank fields",
@@ -77,6 +89,10 @@ class InputWindow:
 
             messagebox.showerror("Non-numeric validation error",
                                  "Please check whether number of points and precision parameters are positive integers")
+        elif any(item == False for item in real_check_list):
+
+            messagebox.showerror("Non-real value validation error", 
+                                "Please check whether 'simulation time' and 'sound speed' are positive reals")
         elif any([getdouble(item) < 0 for item in (list_int + list_real)]):
 
             messagebox.showerror("Negative value validation error", "Please check whether all values are positive")
