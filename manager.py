@@ -63,6 +63,9 @@ class Manager:
         """
         Starts process of showing animated string and plots
         """
+        assert self._mathematical_simulation
+        assert self._physical_simulation
+
         self._output_manager = OutputManager(self, self._mathematical_simulation, self._physical_simulation)
 
         self._output_manager.start_animation()
