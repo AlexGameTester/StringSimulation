@@ -57,12 +57,12 @@ class Manager:
         assert self._physical_simulation
         print('Called')
 
-        self._output_manager = OutputManager(self, self._mathematical_simulation, self._physical_simulation)
-
-        self._output_manager.start_animation()
+        self.start_output()
 
     def start_output(self):
         """
         Starts process of showing animated string and plots
         """
-        pass
+        self._output_manager = OutputManager(self, self._mathematical_simulation, self._physical_simulation)
+
+        self._output_manager.start_animation()
