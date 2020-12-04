@@ -37,7 +37,14 @@ class InputWindow:
             self._close()
         else:
             pass
-
+    
+    def onValidate(self, i):
+        if getdouble(i) > 7:
+            self.app.bell()
+            return False
+        else:
+            return True
+    
     def get_parameters(self) -> StartParameters:
         """
         Reads data from the window, validates it and transforms it into a list of parameters
@@ -55,8 +62,20 @@ class InputWindow:
             elif s[0] in ('-', '+'):
                 return s[1:].isdigit()
             return s.isdigit()
+        
+        def check_whether_real(s):
+            res_str = s.replace('.', '', 1)
+            if len(s) == 0:
+                return "Blanked"
+            elif s[0].isnumeric() == False:
+                return False
+            elif res_str.isnumeric() == False:
+                return False
+            else:
+                return True
 
         int_check_list = [check_int(item) for item in list_int]
+        real_check_list = [check_whether_real(item) for item in list_real]
 
         if not all([text1, text2, text3, text4]):
             box1 = messagebox.askquestion("Validation Error: Blank fields",
@@ -77,6 +96,10 @@ class InputWindow:
 
             messagebox.showerror("Non-numeric validation error",
                                  "Please check whether number of points and precision parameters are positive integers")
+        elif any(item == False for item in real_check_list):
+
+            messagebox.showerror("Non-real value validation error", 
+                                "Please check whether 'simulation time' and 'sound speed' are positive reals")
         elif any([getdouble(item) < 0 for item in (list_int + list_real)]):
 
             messagebox.showerror("Negative value validation error", "Please check whether all values are positive")
@@ -114,6 +137,8 @@ class InputWindow:
         self.app.geometry('400x250')
         self.app.resizable(width=False, height=False)
 
+        validate_command = (self.app.register(self.onValidate), '%i')
+
         center_frame = Frame(self.app)
         center_frame.pack(side=TOP)
 
@@ -122,22 +147,26 @@ class InputWindow:
 
         self.label1 = Label(center_frame, text="Speed of sound in material")
         self.label1.grid(row=0, column=0, pady=5, padx=5)
-        self.sound_speed_entry = Entry(center_frame)
+        self.sound_speed_entry = Entry(center_frame, validatecommand=validate_command, validate="key")
+        self.sound_speed_entry.insert(0, "1")
         self.sound_speed_entry.grid(row=0, column=1, pady=5, padx=5)
 
         self.label2 = Label(center_frame, text="Simulation Time")
         self.label2.grid(row=1, column=0, pady=5, padx=5)
-        self.simulation_time_entry = Entry(center_frame)
+        self.simulation_time_entry = Entry(center_frame, validatecommand=validate_command, validate="key")
+        self.simulation_time_entry.insert(0, "1")
         self.simulation_time_entry.grid(row=1, column=1, pady=5, padx=5)
 
         self.label3 = Label(center_frame, text="Number of points in a chain")
         self.label3.grid(row=2, column=0, pady=5, padx=5)
-        self.points_entry = Entry(center_frame)
+        self.points_entry = Entry(center_frame, validatecommand=validate_command, validate="key")
+        self.points_entry.insert(0, "1")
         self.points_entry.grid(row=2, column=1, pady=5, padx=5)
 
         self.label4 = Label(center_frame, text="Precision of modelling")
         self.label4.grid(row=3, column=0, pady=5, padx=5)
-        self.precision_entry = Entry(center_frame)
+        self.precision_entry = Entry(center_frame, validatecommand=validate_command, validate="key")
+        self.precision_entry.insert(0, "1")
         self.precision_entry.grid(row=3, column=1, pady=5, padx=5)
 
         self.label5 = Label(center_frame, text="Solution method")
@@ -165,3 +194,4 @@ class InputWindow:
     def _close(self):
         self.app.destroy()
         self.manager = None
+
