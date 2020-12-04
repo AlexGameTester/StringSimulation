@@ -85,7 +85,7 @@ class CalculationsManager:
 
         sim_time = int(start_params.simulation_time * self.fps)
         # TODO: really read parameters here
-        x = np.linspace(0, 300, 2000)
+        x = np.linspace(0, 400, 2000)
         y = 25 * np.sin(3 * np.pi * x / 300)
         y[0] = 0
         y[len(y) - 1] = 0
@@ -97,6 +97,8 @@ class CalculationsManager:
         """
         Prepares to start of calculation and starts a calculation cycle
         """
+        sim_params = self._get_simulation_parameters()
+
         def make_phys():
             """
             Temporary method to make physical simulator
@@ -109,7 +111,6 @@ class CalculationsManager:
             length_0 = create_init_params(amount_of_points, length, max_velocity)
             return PhysicalSimulator(sim_params, length_0)
 
-        sim_params = self._get_simulation_parameters()
         self._physical_simulator = make_phys()
         self._mathematical_simulator = MathematicalSimulator(sim_params)
 
