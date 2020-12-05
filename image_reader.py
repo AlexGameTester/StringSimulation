@@ -29,7 +29,7 @@ class ImageReader:
         Opens an image with string and represents it with points
 
         :param path: path of the image
-        :return: a [(x, y)] list with points' coordinates
+        :return: a tuple (x, y) with numpy arrays of x and y points' coordinates
         """
         if not path:
             raise ValueError("String path mustn't be empty")
@@ -54,13 +54,15 @@ class ImageReader:
         complex_points = points_x + 1j * points_y  # represent points as complex numbers
         complex_points = ImageReader._normalize_points(complex_points)
 
-        return list(zip(complex_points.real, complex_points.imag))
+        return complex_points.real, complex_points.imag
 
 
 def main():
     path = 'test_image.png'
-    points = ImageReader.read_points(path)
-    print(points[:12])
+    x, y = ImageReader.read_points(path)
+    import matplotlib.pyplot as plt
+    plt.plot(x, y)
+    plt.show()
 
 
 if __name__ == "__main__":
