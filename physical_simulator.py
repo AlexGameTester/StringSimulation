@@ -14,8 +14,9 @@ FPS = 400
 POINT_RADIUS = 2
 CALC_NUMBER = 100000
 DELTA_TIME = 0.0001
-K = 600
-M = 1
+ALPHA = 0.00001
+# K = 600
+# M = 1
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -38,6 +39,7 @@ class Point:
     """
     Class of physical point (parts of the cord)
     """
+
     def __init__(self, x, y, y_velocity, number):
         """
         init a point
@@ -52,8 +54,9 @@ class Point:
         self.number = number
         self.coordinates = [(self.x, self.y)]
 
-    def interact(self, left_point_x, left_point_y, right_point_x, right_point_y,
-                 length_0):
+    def interact(self, left_point_x, left_point_y,
+                 right_point_x, right_point_y,
+                 coefficient, length_0):
         """
         interaction of the point with the others
 
@@ -64,12 +67,16 @@ class Point:
         left_distance = math.sqrt((self.x - left_point_x) ** 2 + (self.y - left_point_y) ** 2)
         right_distance = math.sqrt((self.x - right_point_x) ** 2 + (self.y - right_point_y) ** 2)
 
-        left_force_y = (K * math.fabs(left_distance - length_0) *
-                        (left_point_y - self.y) / left_distance)
-        right_force_y = (K * math.fabs(right_distance - length_0) *
-                         (right_point_y - self.y) / right_distance)
+        left_delta_y = left_point_y - self.y
+        right_delta_y = right_point_y - self.y
 
-        acceleration = (left_force_y + right_force_y) / M
+        left_acceleration = (coefficient * left_delta_y *
+                             math.fabs(left_distance - length_0) / left_distance)
+
+        right_acceleration = (coefficient * right_delta_y *
+                              math.fabs(right_distance - length_0) / right_distance)
+
+        acceleration = left_acceleration + right_acceleration
 
         self.velocity -= acceleration * DELTA_TIME
 
@@ -91,18 +98,18 @@ class PhysicalSimulator(Simulator):
     def get_completion_percentage(self) -> float:
         pass
 
-    def __init__(self, params, length_0):
+    def __init__(self, params):
         super().__init__(params)
         self.points = []
         self.my_time = 0
-        self.length_0 = length_0
-        with open("physical_points.txt") as points_file:
-            number = 0
-            for data_string in points_file:
-                x, y, y_velocity = data_string.split()
-                point = Point(int(x), float(y), float(y_velocity), number)
-                self.points.append(point)
-                number += 1
+        self.speed_of_sound = params.speed_of_sound
+        self.amount_of_points = params.number_of_points
+        for number, point in enumerate(zip(params.initial_positions_x,
+                                           params.initial_positions_y,
+                                           params.initial_velocities_y)):
+            x, y, y_velocity = point
+            point = Point(x, y, y_velocity, number)
+            self.points.append(point)
 
     def get_method(self) -> Callable[[float], None]:
         pass
@@ -114,6 +121,11 @@ class PhysicalSimulator(Simulator):
 
     def simulate(self):
         """simulates an interaction between all points of the cord"""
+        length = SCREEN_WIDTH // 2
+        coefficient = (self.speed_of_sound ** 2 * self.amount_of_points *
+                       (self.amount_of_points - 1) / (length ** 2 * (1 - ALPHA)))
+        length_0 = ALPHA * length / (self.amount_of_points - 1)
+
         for i in range(CALC_NUMBER):
             for point in self.points:
                 if point.number != 0 and point.number != len(self.points) - 1:
@@ -121,7 +133,7 @@ class PhysicalSimulator(Simulator):
                                    self.points[point.number - 1].y,
                                    self.points[point.number + 1].x,
                                    self.points[point.number + 1].y,
-                                   self.length_0)
+                                   coefficient, length_0)
                     point.move()
                 point.make_a_record()
 
@@ -137,13 +149,13 @@ class PhysicalSimulator(Simulator):
                 x, y = point.coordinates[self.my_time]
                 pygame.draw.circle(screen,
                                    BLACK,
-                                   (x, int(y)),
+                                   (int(x), int(y)),
                                    POINT_RADIUS)
             else:
                 x, y = point.coordinates[0]
                 pygame.draw.circle(screen,
                                    BLACK,
-                                   (x, int(y)),
+                                   (int(x), int(y)),
                                    POINT_RADIUS)
         if self.my_time < CALC_NUMBER - drawing_step:
             self.my_time += drawing_step
@@ -154,15 +166,23 @@ class PhysicalSimulator(Simulator):
 
 
 def main():
-    amount_of_points = 40
-    length = SCREEN_WIDTH // 2
-    max_velocity = 200
+    import calculations_manager
+    import inputwindow
+
     drawing_step = 30
 
-    length_0 = create_init_params(amount_of_points, length, max_velocity)
+    start_params = inputwindow.StartParameters(1, 100, 40, 1, 1)
+    calc_manager = calculations_manager.CalculationsManager(10, start_params)
 
-    phys_sim = PhysicalSimulator(10, length_0)
+    sim_params = calc_manager._get_simulation_parameters()
+
+    sim_params.speed_of_sound = 150
+    sim_params.number_of_points = 40
+    sim_params.simulation_time = 30
+
+    phys_sim = PhysicalSimulator(sim_params)
     phys_sim.simulate()
+
     phys_simulation = phys_sim.get_simulation()
 
     print("1 - draw phys_sim, 2 - get coordinates in time: ")
