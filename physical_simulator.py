@@ -9,23 +9,29 @@ from simulator import Simulator
 
 SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 900
+POINT_RADIUS = 5
 FPS = 400
-
-POINT_RADIUS = 2
-CALC_NUMBER = 100000
-DELTA_TIME = 0.0001
-ALPHA = 0.00001
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+ALPHA = 0.01
+
 
 class PhysicalSimulation(Simulation):
-
+    """
+       Represents a discrete function of time and coordinate that represents a simulation of string motion
+    """
     def __init__(self, points):
         self.points = points
 
     def get_points_at(self, time_moment: int) -> list:
+        """
+                Returns a numpy array of y-coordinates of points **in consecutive order**
+                 that represents a string at specific moment of time
+
+                :param time_moment: a list of points represented as tuples TODO: choose another type
+        """
         points_coord = []
         for point in self.points:
             points_coord.append(point.coordinates[time_moment])
@@ -54,7 +60,7 @@ class Point:
 
     def interact(self, left_point_x, left_point_y,
                  right_point_x, right_point_y,
-                 coefficient, length_0):
+                 coefficient, length_0, delta_time):
         """
         interaction of the point with the others
 
@@ -77,13 +83,13 @@ class Point:
 
         acceleration = left_acceleration + right_acceleration
 
-        self.velocity -= acceleration * DELTA_TIME
+        self.velocity -= acceleration * delta_time
 
-    def move(self):
+    def move(self, delta_time):
         """
         moves the point on y axis
         """
-        self.y -= self.velocity * DELTA_TIME
+        self.y -= self.velocity * delta_time
 
     def make_a_record(self):
         """
@@ -104,8 +110,15 @@ class PhysicalSimulator(Simulator):
         super().__init__(params)
         self.points = []
         self.my_time = 0
+
         self.speed_of_sound = params.speed_of_sound
         self.amount_of_points = params.number_of_points
+        self.delta_time = 1 / params.accuracy
+        self.drawing_step = int(3 / self.delta_time / 1000)
+        if self.drawing_step == 0:
+            self.drawing_step = 1
+        self.calc_count = params.simulation_time * FPS * self.drawing_step
+
         for number, point in enumerate(zip(params.initial_positions_x,
                                            params.initial_positions_y,
                                            params.initial_velocities_y)):
@@ -131,18 +144,18 @@ class PhysicalSimulator(Simulator):
                        (self.amount_of_points - 1) / (length ** 2 * (1 - ALPHA)))
         length_0 = ALPHA * length / (self.amount_of_points - 1)
 
-        for i in range(CALC_NUMBER):
+        for i in range(self.calc_count):
             for point in self.points:
                 if point.number != 0 and point.number != len(self.points) - 1:
                     point.interact(self.points[point.number - 1].x,
                                    self.points[point.number - 1].y,
                                    self.points[point.number + 1].x,
                                    self.points[point.number + 1].y,
-                                   coefficient, length_0)
-                    point.move()
+                                   coefficient, length_0, self.delta_time)
+                    point.move(self.delta_time)
                 point.make_a_record()
 
-    def draw(self, screen, drawing_step):
+    def draw(self, screen):
         """
         draws points of the cord on window "screen"
 
@@ -162,8 +175,8 @@ class PhysicalSimulator(Simulator):
                                    BLACK,
                                    (int(x), int(y)),
                                    POINT_RADIUS)
-        if self.my_time < CALC_NUMBER - drawing_step:
-            self.my_time += drawing_step
+        if self.my_time < self.calc_count - self.drawing_step:
+            self.my_time += self.drawing_step
             return False
         else:
             time.sleep(3)
@@ -174,8 +187,6 @@ def main():
     import calculations_manager
     import inputwindow
 
-    drawing_step = 30
-
     start_params = inputwindow.StartParameters(1, 100, 40, 1, 1)
     calc_manager = calculations_manager.CalculationsManager(10, start_params)
 
@@ -183,7 +194,8 @@ def main():
 
     sim_params.speed_of_sound = 150
     sim_params.number_of_points = 40
-    sim_params.simulation_time = 30
+    sim_params.simulation_time = 5
+    sim_params.accuracy = 10000
 
     phys_sim = PhysicalSimulator(sim_params)
     phys_sim.simulate()
@@ -194,7 +206,7 @@ def main():
     act = int(input())
 
     if act == 1:
-        draw_phys_sim(phys_sim, drawing_step)
+        draw_phys_sim(phys_sim)
     elif act == 2:
         get_coord(phys_simulation)
 
@@ -223,7 +235,7 @@ def create_init_params(amount_of_points, length, max_velocity):
     return delta_r // 400
 
 
-def draw_phys_sim(phys_sim, drawing_step):
+def draw_phys_sim(phys_sim):
     """
     function for unit-tests
     draws the animation
@@ -245,7 +257,7 @@ def draw_phys_sim(phys_sim, drawing_step):
                 if key == pygame.K_q or key == pygame.K_ESCAPE:
                     finished = True
 
-        anim_is_ended = phys_sim.draw(screen, drawing_step)
+        anim_is_ended = phys_sim.draw(screen)
         if anim_is_ended:
             finished = True
 

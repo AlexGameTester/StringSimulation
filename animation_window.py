@@ -3,12 +3,11 @@ import time
 import pygame
 import numpy as np
 
-import math_simulator
-import physical_simulator
 import calculations_manager
 
 SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 900
+CALC_NUMBER = 60000
 FPS = 400
 
 POINT_RADIUS = 5
@@ -54,11 +53,9 @@ class AnimationWindow:
                     if key == pygame.K_q or key == pygame.K_ESCAPE:
                         finished = True
 
-            if self.animation_time < physical_simulator.CALC_NUMBER - DRAWING_STEP:
+            if self.animation_time < CALC_NUMBER - DRAWING_STEP:
                 phys_points_coord = self._phys_simulation.get_points_at(self.animation_time)
                 math_points_coord = self._math_simulation.get_points_at(self.animation_time)
-                # math_points_coord = [(20, 20), (40, 40), (60, 60), (100, 100), (200, 200), (600, 600)]
-                # points_coordinates = [phys_points_coord, math_points_coord]
                 draw_points(screen, phys_points_coord, math_points_coord)
 
                 self.animation_time += DRAWING_STEP
@@ -72,13 +69,25 @@ class AnimationWindow:
 
 
 def main():
+    import inputwindow
+    import math_simulator
+    import physical_simulator
+
     params = get_params()
     math_sim = math_simulator.MathematicalSimulator(params)
     math_sim.simulate()
     math_simulation = math_sim.get_simulation()
 
-    phys_sim = physical_simulator.PhysicalSimulator(10, 1)
+    start_params = inputwindow.StartParameters(1, 100, 40, 1, 1)
+    calc_manager = calculations_manager.CalculationsManager(10, start_params)
+    sim_params = calc_manager._get_simulation_parameters()
+    sim_params.speed_of_sound = 150
+    sim_params.number_of_points = 40
+    sim_params.simulation_time = 5
+    sim_params.accuracy = 10000
+    phys_sim = physical_simulator.PhysicalSimulator(sim_params)
     phys_sim.simulate()
+
     phys_simulation = phys_sim.get_simulation()
 
     animation = AnimationWindow(math_simulation, phys_simulation)
@@ -96,7 +105,8 @@ def get_params():
 
     number_of_points = 40
 
-    params = calculations_manager.SimulationParameters(1000, 1/3, initial_pos_x, initial_pos_y, initial_vel_y, accuracy=5,
+    params = calculations_manager.SimulationParameters(1000, 1/3, initial_pos_x, initial_pos_y, initial_vel_y,
+                                                       accuracy=5,
                                                        number_of_points=number_of_points)
 
     return params
