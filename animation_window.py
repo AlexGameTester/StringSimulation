@@ -24,7 +24,6 @@ class AnimationWindow:
     """
     Represents a pygame window that shows animated simulations
     """
-
     def __init__(self, math_simulation, phys_simulation):
         self._math_simulation = math_simulation
         self._phys_simulation = phys_simulation
@@ -95,6 +94,10 @@ def main():
 
 
 def get_params():
+    """
+    function for unit-tests
+    gets parameters for math simulation
+    """
     initial_pos_x = np.linspace(0, SCREEN_WIDTH // 2, 2000)
     initial_pos_y = 30e5 * np.sin(3 * np.pi * initial_pos_x) + 30e5 * np.sin(12 * np.pi * initial_pos_x + 7/8 * np.pi)
     # initial_pos_y = initial_pos_x * 0
@@ -113,6 +116,14 @@ def get_params():
 
 
 def draw_points(screen, phys_points_coord, math_points_coord):
+    """
+    draws two cords: one from the physical simulation
+    and another one from the mathematical simulation on screen
+
+    screen - an active screen
+    phys_points_coord - coordinates of points of physically simulated cord
+    math_points_coord - coordinates of points of mathematically simulates cord
+    """
     screen.fill(WHITE)
     for point in phys_points_coord:
         points_color = POINTS_COLORS[0]
