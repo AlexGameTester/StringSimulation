@@ -15,8 +15,6 @@ POINT_RADIUS = 2
 CALC_NUMBER = 100000
 DELTA_TIME = 0.0001
 ALPHA = 0.00001
-# K = 600
-# M = 1
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -62,6 +60,7 @@ class Point:
 
         left_point_x, left_point_y - coordinates of the left point
         right_point_x, right_point_y - coordinates of the right point
+        coefficient - ratio of K to M for the cord
         length_0 - unstretched spring length
         """
         left_distance = math.sqrt((self.x - left_point_x) ** 2 + (self.y - left_point_y) ** 2)
@@ -87,6 +86,9 @@ class Point:
         self.y -= self.velocity * DELTA_TIME
 
     def make_a_record(self):
+        """
+        makes a record to a coordinates list
+        """
         self.coordinates.append((self.x, self.y))
 
 
@@ -115,6 +117,9 @@ class PhysicalSimulator(Simulator):
         pass
 
     def get_simulation(self) -> Simulation:
+        """
+        creates and returns an object of PhysicalSimulation class
+        """
         physical_simulation = PhysicalSimulation(self.points)
 
         return physical_simulation
@@ -219,6 +224,10 @@ def create_init_params(amount_of_points, length, max_velocity):
 
 
 def draw_phys_sim(phys_sim, drawing_step):
+    """
+    function for unit-tests
+    draws the animation
+    """
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.fill(WHITE)
@@ -246,6 +255,10 @@ def draw_phys_sim(phys_sim, drawing_step):
 
 
 def get_coord(physical_simulation):
+    """
+    function for unit-tests
+    prints a list of coordinates of all points at a certain point in time
+    """
     finished = False
     while not finished:
         print("\nEnter time (int): {(-1) - exit}")
