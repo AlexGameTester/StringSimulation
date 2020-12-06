@@ -2,9 +2,9 @@ import os
 import numpy as np
 from skimage import io
 
-
 SUPPORTED_EXTENSIONS = ['.png']
 WHITE_GRAYSCALE = 1
+
 
 def _normalize_points(points: np.ndarray):
     """
@@ -20,6 +20,7 @@ def _normalize_points(points: np.ndarray):
     rotation = diff.conj() / abs(diff)  # complex number that rotates (abs = 1) points to neglect incline (conj
     # makes rotation in opposite to incline direction)
     return points * rotation
+
 
 def read_points(path: str):
     """
@@ -45,7 +46,7 @@ def read_points(path: str):
     top_nonwhite = is_white.argmax(axis=0)
     bot_nonwhite = len(is_white) - np.flipud(is_white).argmax(axis=0)
 
-    points_y = len(is_white) / 2 - 1/2 * (top_nonwhite + bot_nonwhite)  # minus is added because coordinate
+    points_y = len(is_white) / 2 - 1 / 2 * (top_nonwhite + bot_nonwhite)  # minus is added because coordinate
     # system is flipped
     points_x = np.array([i for i in range(len(points_y))])
     complex_points = points_x + 1j * points_y  # represent points as complex numbers
