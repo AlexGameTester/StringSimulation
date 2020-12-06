@@ -93,9 +93,8 @@ class CalculationsManager:
             velocity = 0
             with open("physical_points.txt", "w") as points:
                 for i in range(start_params.number_of_points):
-                    # velocity = int(max_velocity * (math.sin(2 * math.pi * i / start_params.number_of_points) +
-                    #                                math.sin(1 * math.pi * i / start_params.number_of_points)))
-                    y = max_y * math.sin(2 * math.pi * i / start_params.number_of_points)
+                    velocity = int(max_velocity * (math.sin(2 * math.pi * i / start_params.number_of_points) +
+                                                   math.sin(1 * math.pi * i / start_params.number_of_points)))
                     if i == start_params.number_of_points-1:
                         y = 0.
                     point = str(x) + " " + str(y) + " " + str(velocity) + "\n"
