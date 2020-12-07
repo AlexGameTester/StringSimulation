@@ -1,8 +1,13 @@
+from time import sleep
+
 from inputwindow import StartParameters
 from math_simulator import MathematicalSimulator
 from physical_simulator import PhysicalSimulator
 
 import numpy as np
+import tkinter as tk
+import tkinter.ttk as ttk
+import threading
 
 
 class SimulationParameters:
@@ -55,12 +60,42 @@ class ProgressBar:
     """
     Represents a window that shows progress bar during calculations
     """
-    def show_status(self, percentage: float):
+    app_title = 'Simulation in progress'
+    app_geometry = '400x240'
+    label_text = '  {}%  '
+
+    def __init__(self):
+        app = tk.Tk()
+
+        self.app = app
+        app.title(self.app_title)
+        app.geometry()
+        app.resizable(False, False)
+
+        main_frame = tk.Frame(app)
+        main_frame.pack(side=tk.TOP, fill='both')
+
+        self.progressbar = ttk.Progressbar(main_frame, length=340)
+        self.progressbar.grid(row=1, column=0, padx=(30, 30), pady=(0, 40))
+        self.pb_label = tk.Label(main_frame)
+        self.pb_label.grid(row=0, column=0, padx=(30, 30), pady=(40, 0))
+        self.pb_label['text'] = self.label_text.format(0)
+
+    def start(self):
+        self.app.mainloop()
+
+    def set_percentage(self, percentage: float):
         """
         Called when percentage of completion of calculations is changed to show it
+
         :param percentage: a percentage of completion of calculations
         """
-        pass
+        assert self.progressbar
+        assert self.pb_label
+
+        val = int(percentage * 100)
+        self.progressbar['value'] = val
+        self.pb_label['text'] = self.label_text.format(val)
 
 
 class CalculationsManager:
@@ -134,3 +169,16 @@ class CalculationsManager:
         self.manager.on_calculation_ended()
 
 
+def main():
+    def func(pb):
+        for i in range(3):
+            sleep(3)
+            pb.set_percentage(0.05 * i)
+    pb = ProgressBar()
+    thr = threading.Thread(target=func, args=(pb,))
+    thr.start()
+    pb.start()
+
+
+if __name__ == "__main__":
+    main()
