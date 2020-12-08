@@ -122,7 +122,7 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the precision parameter is less or equal than 1000")
-        elif getint(self.points_entry.get()) < 3:
+        elif getint(self.points_entry.get()) < 3: #number of points validation - >= 3
             
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the number of points in a chain is greater or equal than 3")
@@ -130,11 +130,11 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the precision parameter is greater or equal than 20")                         
-        elif getdouble(text1) > 343: #speed of sound must be < 343 validation
+        elif getdouble(text1) > 343: #speed of sound must be <= 343 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text1) < 5: #speed of sound must be > 10 validation
+        elif getdouble(text1) < 10: #speed of sound must be >= 10 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is greater or equal than 5 m/s")
@@ -142,7 +142,7 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the simulation time within the required range")
-        elif getdouble(text2) < 5: #simulation time must be > 5 validation
+        elif getdouble(text2) < 5: #simulation time must be >= 5 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the simulation time is greater or equal than 5")
