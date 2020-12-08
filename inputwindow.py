@@ -12,6 +12,7 @@ except DistributionNotFound:
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
 
 
 class StartParameters:
@@ -25,12 +26,13 @@ class StartParameters:
 
     """
 
-    def __init__(self, speed_of_sound, simulation_time, number_of_points, precision, method):
+    def __init__(self, speed_of_sound, simulation_time, number_of_points, precision, method, file_picked):
         self.speed_of_sound = speed_of_sound
         self.simulation_time = simulation_time
         self.number_of_points = number_of_points
         self.precision = precision
         self.method = method
+        self.file_picked = file_picked
         self.data = [speed_of_sound, simulation_time, number_of_points, precision, method]
 
 
@@ -55,6 +57,13 @@ class InputWindow:
             return False
         else:
             return True
+    
+    def pickfile(self):
+        filename1 = filedialog.askopenfilename(parent=self.app, initialdir = "/",title = "Select a file with input parameters",
+                                                filetypes = (("txt files","*.txt"),))
+        if filename1:
+            self.filename = filename1
+
     
     def get_parameters(self) -> StartParameters:
         """
@@ -145,10 +154,10 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text1) < 10: #speed of sound must be >= 10 validation
+        elif getdouble(text1) < 5: #speed of sound must be >= 5 validation
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the speed of sound in material is greater or equal than 5 m/s")
+                                 "Please check whether the speed of sound in material is greater or equal than 5")
         elif getdouble(text2) > 100: #simulation time must be < 100 validation
 
             messagebox.showerror("Parameter is out of range",
@@ -157,9 +166,14 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the simulation time is greater or equal than 5")
+        elif self.filename == None:
+            
+            messagebox.showerror("No file picked",
+                                 "")
         else:
             c = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4),
-                                method=self.pick.get())
+                                method=self.pick.get(), file_picked=self.filename)
+            print(c.file_picked)
             return c
 
     def __init__(self, manager):
@@ -170,7 +184,8 @@ class InputWindow:
         self.app = app
         self.app.geometry('400x250')
         self.app.resizable(width=False, height=False)
-
+        self.filename = None
+        
         validate_command = (self.app.register(self.onValidate), '%i')
 
         center_frame = Frame(self.app)
@@ -212,6 +227,9 @@ class InputWindow:
         button1 = Button(center_frame, command=self._start, width=10,
                          height=2, font=18, text="Start")
         button1.grid(row=5)
+        
+        button_pick_file = Button(center_frame, width=10, height=1, command=self.pickfile, text="File menu")
+        button_pick_file.grid(row=6, column=1)
 
         button2 = Button(center_frame, command=self.exit1, width=4, height=1, font=18,
                          text="Quit")
