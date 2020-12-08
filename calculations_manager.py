@@ -84,8 +84,8 @@ class CalculationsManager:
         """
         def create_init_params():
             length = 900 / 2
-            max_velocity = 200
-            max_y = 900 / 6
+            max_velocity = 0.4
+            max_y = 900 / 6 * 0.001
 
             delta_r = length / start_params.number_of_points
             x = 0
@@ -93,7 +93,7 @@ class CalculationsManager:
             velocity = 0
             with open("physical_points.txt", "w") as points:
                 for i in range(start_params.number_of_points):
-                    velocity = int(max_velocity * (math.sin(2 * math.pi * i / start_params.number_of_points) +
+                    velocity = (max_velocity * (math.sin(2 * math.pi * i / start_params.number_of_points) +
                                                    math.sin(1 * math.pi * i / start_params.number_of_points)))
                     if i == start_params.number_of_points-1:
                         y = 0.
