@@ -57,6 +57,10 @@ class InputWindow:
         list_real = [text1, text2]
 
         def check_int(s):
+            """
+            Checks whether given string is an integer, in the case when string = "" returns - 'Blanked'
+
+            """
             if len(s) == 0:
                 return "Blanked"
             elif s[0] in ('-', '+'):
@@ -64,6 +68,9 @@ class InputWindow:
             return s.isdigit()
         
         def check_whether_real(s):
+            """
+            Checks whether given string represents a real number, if string = "" then returns 'Blanked'
+            """
             res_str = s.replace('.', '', 1)
             if len(s) == 0:
                 return "Blanked"
@@ -115,14 +122,30 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the precision parameter is less or equal than 1000")
-        elif getdouble(text1) > 343:
+        elif getint(self.points_entry.get()) < 3:
+            
+            messagebox.showerror("Parameter is out of range",
+                                 "Please check whether the number of points in a chain is greater or equal than 3")
+        elif getint(self.precision_entry.get()) < 10: #precision must be >= 10 validation
+
+            messagebox.showerror("Parameter is out of range",
+                                 "Please check whether the precision parameter is greater or equal than 20")                         
+        elif getdouble(text1) > 343: #speed of sound must be < 343 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text2) > 100:
+        elif getdouble(text1) < 5: #speed of sound must be > 10 validation
+
+            messagebox.showerror("Parameter is out of range",
+                                 "Please check whether the speed of sound in material is greater or equal than 5 m/s")
+        elif getdouble(text2) > 100: #simulation time must be < 100 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the simulation time within the required range")
+        elif getdouble(text2) < 5: #simulation time must be > 5 validation
+
+            messagebox.showerror("Parameter is out of range",
+                                 "Please check whether the simulation time is greater or equal than 5")
         else:
             c = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4),
                                 method=self.pick.get())
