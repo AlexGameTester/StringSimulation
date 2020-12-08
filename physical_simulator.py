@@ -22,8 +22,10 @@ class PhysicalSimulation(Simulation):
     """
        Represents a discrete function of time and coordinate that represents a simulation of string motion
     """
-    def __init__(self, points):
+    def __init__(self, simulation_time, counts_per_frame, points):
+        super(PhysicalSimulation, self).__init__(simulation_time)
         self.points = points
+        self.counts_per_frame = counts_per_frame
 
     def get_points_at(self, time_moment: int) -> list:
         """
@@ -34,7 +36,7 @@ class PhysicalSimulation(Simulation):
         """
         points_coord = []
         for point in self.points:
-            points_coord.append(point.coordinates[time_moment])
+            points_coord.append(point.coordinates[time_moment * self.counts_per_frame])
 
         return points_coord
 
@@ -113,11 +115,13 @@ class PhysicalSimulator(Simulator):
 
         self.speed_of_sound = params.speed_of_sound
         self.amount_of_points = params.number_of_points
-        self.delta_time = 1 / params.accuracy
+        self.delta_time = 1 / params.accuracy * 3
         self.drawing_step = int(3 / self.delta_time / 1000)
         if self.drawing_step == 0:
             self.drawing_step = 1
-        self.calc_count = params.simulation_time * FPS * self.drawing_step
+        # self.calc_count = params.simulation_time * self.drawing_step
+        self.counts_per_frame = int(1 / self.delta_time)
+        self.calc_count = params.simulation_time * self.counts_per_frame
 
         for number, point in enumerate(zip(params.initial_positions_x,
                                            params.initial_positions_y,
@@ -133,7 +137,7 @@ class PhysicalSimulator(Simulator):
         """
         creates and returns an object of PhysicalSimulation class
         """
-        physical_simulation = PhysicalSimulation(self.points)
+        physical_simulation = PhysicalSimulation(self.calc_count // self.counts_per_frame, self.counts_per_frame, self.points)
 
         return physical_simulation
 
@@ -144,16 +148,20 @@ class PhysicalSimulator(Simulator):
                        (self.amount_of_points - 1) / (length ** 2 * (1 - ALPHA)))
         length_0 = ALPHA * length / (self.amount_of_points - 1)
 
-        for i in range(self.calc_count):
+        i = 0
+        while i < self.calc_count:
             for point in self.points:
                 if point.number != 0 and point.number != len(self.points) - 1:
-                    point.interact(self.points[point.number - 1].x,
-                                   self.points[point.number - 1].y,
-                                   self.points[point.number + 1].x,
-                                   self.points[point.number + 1].y,
+                    p1 = self.points[point.number - 1]
+                    p2 = self.points[point.number + 1]
+                    point.interact(p1.x,
+                                   p1.y,
+                                   p2.x,
+                                   p2.y,
                                    coefficient, length_0, self.delta_time)
                     point.move(self.delta_time)
                 point.make_a_record()
+            i += 1
 
     def draw(self, screen):
         """
@@ -192,10 +200,10 @@ def main():
 
     sim_params = calc_manager._get_simulation_parameters()
 
-    sim_params.speed_of_sound = 150
+    sim_params.speed_of_sound = 3
     sim_params.number_of_points = 40
     sim_params.simulation_time = 5
-    sim_params.accuracy = 10000
+    sim_params.accuracy = 1000
 
     phys_sim = PhysicalSimulator(sim_params)
     phys_sim.simulate()

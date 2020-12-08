@@ -9,11 +9,12 @@ FPS = 400
 
 
 class MathSimulation(Simulation):
-    def __init__(self, points):
+    def __init__(self, simulation_time, points):
+        super(MathSimulation, self).__init__(simulation_time)
         self.points = points
 
     def get_points_at(self, time: int) -> np.ndarray:
-        return self.points[time // FPS]
+        return self.points[time]
 
 
 class MathematicalSimulator(Simulator):
@@ -76,7 +77,7 @@ class MathematicalSimulator(Simulator):
             self._calculated_points.append(points_at(i, self._number_of_points))
 
     def get_simulation(self) -> Simulation:
-        return MathSimulation(self._calculated_points)
+        return MathSimulation(self._simulation_time, self._calculated_points)
 
 
 class FourierSolver:

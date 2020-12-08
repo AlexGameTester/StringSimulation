@@ -9,6 +9,10 @@ class Simulation(ABC):
     """
 
     @abstractmethod
+    def __init__(self, simulation_time: int):
+        self.simulation_time = simulation_time
+
+    @abstractmethod
     def get_points_at(self, time: int) -> list:
         """
         Returns a numpy array of y-coordinates of points **in consecutive order**

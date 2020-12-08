@@ -11,7 +11,7 @@ CALC_NUMBER = 60000
 FPS = 400
 
 POINT_RADIUS = 5
-DRAWING_STEP = 30
+DRAWING_STEP = 1
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -52,7 +52,9 @@ class AnimationWindow:
                     if key == pygame.K_q or key == pygame.K_ESCAPE:
                         finished = True
 
-            if self.animation_time < CALC_NUMBER - DRAWING_STEP:
+            assert self._math_simulation.simulation_time == self._phys_simulation.simulation_time, 'Math: {}, Phys: {}'.format(self._math_simulation.simulation_time, self._phys_simulation.simulation_time)
+
+            if self.animation_time < self._math_simulation.simulation_time:
                 phys_points_coord = self._phys_simulation.get_points_at(self.animation_time)
                 math_points_coord = self._math_simulation.get_points_at(self.animation_time)
                 draw_points(screen, phys_points_coord, math_points_coord)
@@ -130,7 +132,7 @@ def draw_points(screen, phys_points_coord, math_points_coord):
         x, y = point
         pygame.draw.circle(screen,
                            points_color,
-                           (int(x), int(y)),
+                           (int(x), int(10 * (y - SCREEN_HEIGHT//2) + SCREEN_HEIGHT // 2)),
                            POINT_RADIUS)
 
     for point in math_points_coord:
@@ -138,7 +140,7 @@ def draw_points(screen, phys_points_coord, math_points_coord):
         x, y = point
         pygame.draw.circle(screen,
                            points_color,
-                           (int(x + SCREEN_WIDTH // 4), int(y) + SCREEN_HEIGHT // 2),
+                           (int(x + SCREEN_WIDTH // 4), int(-10 * y) + SCREEN_HEIGHT // 2),
                            POINT_RADIUS)
 
 
