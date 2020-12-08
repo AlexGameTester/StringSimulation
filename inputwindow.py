@@ -1,3 +1,14 @@
+import sys
+from pkg_resources import WorkingSet , DistributionNotFound
+working_set = WorkingSet()
+#check whether required modules are active.
+try: 
+    working_set.require('pygame', 'numpy', 'time', 'matplotlib', 'typing')
+except DistributionNotFound:
+    print("Seems that some required python modules were not found," 
+        " check for availability: \nnumpy \npygame \ntime \nmatplotlib \ntyping")
+    sys.exit()
+
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
