@@ -7,7 +7,7 @@ class StartParameters:
     """Starting parameter which are set by the user.
 
     :param speed_of_sound: speed of sound in a material of a string. Less or equal than 343
-    :param simulation_time: simulation modelling duration. Less or equal than 100
+    :param simulation_time: simulation modelling duration in seconds. Less or equal than 100
     :param number_of_points: number of points in a string which will be modelled. Less or equal than 1000
     :param precision: parameter which affects the step with which modelling will be done. Less or equal than 1000.
     :param method: solution method of wave equation. Options: Fourier,
@@ -134,7 +134,7 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text1) < 10: #speed of sound must be >= 10 validation
+        elif getdouble(text1) < 1: #speed of sound must be >= 1 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is greater or equal than 5 m/s")
