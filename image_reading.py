@@ -22,15 +22,19 @@ def _normalize_points(points: np.ndarray):
     return points * rotation
 
 
-def read_points(path: str):
+def read_points(path: str, max_y=1):
     """
     Opens an image with string and represents it with points
 
+    :param max_y: maximal value of y coordinate
     :param path: path of the image
     :return: a tuple (x, y) with numpy arrays of x and y points' coordinates
     """
     if not path:
         raise ValueError("String path mustn't be empty")
+
+    if max_y <= 0:
+        raise ValueError("max_y must be positive")
 
     file, extension = os.path.splitext(path)
     if extension not in SUPPORTED_EXTENSIONS:
@@ -46,13 +50,17 @@ def read_points(path: str):
     top_nonwhite = is_white.argmax(axis=0)
     bot_nonwhite = len(is_white) - np.flipud(is_white).argmax(axis=0)
 
-    points_y = len(is_white) / 2 - 1 / 2 * (top_nonwhite + bot_nonwhite)  # minus is added because coordinate
-    # system is flipped
+    points_y = len(is_white) / 2 - 1 / 2 * (top_nonwhite + bot_nonwhite)  # minus is added because
+    # coordinate system is flipped
     points_x = np.array([i for i in range(len(points_y))])
     complex_points = points_x + 1j * points_y  # represent points as complex numbers
     complex_points = _normalize_points(complex_points)
 
-    return complex_points.real, complex_points.imag
+    max_y_before = np.max(np.abs(complex_points.imag))
+    print(max_y_before)
+    scale_y = max_y / max_y_before
+
+    return complex_points.real, complex_points.imag * scale_y
 
 
 def main():
