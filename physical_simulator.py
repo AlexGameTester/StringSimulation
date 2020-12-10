@@ -37,7 +37,7 @@ class PhysicalSimulation(Simulation):
         """
         points_coord = []
         for point in self.points:
-            points_coord.append(point.coordinates[time_moment * self.counts_per_frame])
+            points_coord.append(point.coordinates[time_moment])
 
         return points_coord
 
@@ -169,9 +169,10 @@ class PhysicalSimulator(Simulator):
                                    right_point_number.y,
                                    coefficient, length_0, self.delta_time)
                     point.move(self.delta_time)
-                point.make_a_record()
+                if i % self.counts_per_frame == 0:
+                    point.make_a_record()
 
-            if i % 100 == 0:
+            if i % 500 == 0:
                 progressbar.set_percentage(phys_percentage=i / self.calc_count)
             i += 1
 
