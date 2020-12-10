@@ -29,44 +29,71 @@ class AnimationWindow:
         self._phys_simulation = phys_simulation
 
         self.animation_time = 0
+        self.paused = False
+        self.finished = False
+        self.screen = None
+
+    def playback_control(self, event):
+        key_pause = pygame.K_p
+        key_restart = pygame.K_r
+        key_backwards = pygame.K_LEFT
+        key_forward = pygame.K_RIGHT
+        key_quit = pygame.K_ESCAPE
+        step = 300
+
+        assert self.screen
+
+        if event.type == pygame.KEYUP:
+            key = event.key
+            if key == key_pause:
+                self.paused = not self.paused
+            elif key == key_restart:
+                self.animation_time = 0
+                self.draw_frame()
+            elif key == key_backwards:
+                self.animation_time = max(0, self.animation_time - step)
+                self.draw_frame()
+            elif key == key_forward:
+                self.animation_time = min(self._math_simulation.simulation_time, self.animation_time + step)
+                self.draw_frame()
+            elif key == key_quit:
+                self.finished = True
 
     def start_animation(self):
         """
         Creates pygame window and starts showing animation. **Blocks program execution**
         """
         pygame.init()
-        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        screen.fill(WHITE)
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen.fill(WHITE)
 
         clock = pygame.time.Clock()
-        finished = False
 
-        while not finished:
+        assert self._math_simulation.simulation_time == self._phys_simulation.simulation_time, \
+            'Math: {}, Phys: {}'.format(self._math_simulation.simulation_time,
+                                        self._phys_simulation.simulation_time)
+
+        while not self.finished:
             clock.tick(FPS)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    finished = True
-                elif event.type == pygame.KEYDOWN:
-                    key = event.key
-                    if key == pygame.K_q or key == pygame.K_ESCAPE:
-                        finished = True
+                    self.finished = True
+                else:
+                    self.playback_control(event)
 
-            assert self._math_simulation.simulation_time == self._phys_simulation.simulation_time, 'Math: {}, Phys: {}'.format(self._math_simulation.simulation_time, self._phys_simulation.simulation_time)
-
-            if self.animation_time < self._math_simulation.simulation_time:
-                phys_points_coord = self._phys_simulation.get_points_at(self.animation_time)
-                math_points_coord = self._math_simulation.get_points_at(self.animation_time)
-                draw_points(screen, phys_points_coord, math_points_coord)
-
+            if self.animation_time < self._math_simulation.simulation_time and not self.paused:
+                self.draw_frame()
                 self.animation_time += DRAWING_STEP
-            else:
-                time.sleep(2)
-                finished = True
 
             pygame.display.set_caption(str(clock.get_fps()))
 
-            pygame.display.update()
+    def draw_frame(self):
+        phys_points_coord = self._phys_simulation.get_points_at(self.animation_time)
+        math_points_coord = self._math_simulation.get_points_at(self.animation_time)
+        draw_points(self.screen, phys_points_coord, math_points_coord)
+
+        pygame.display.update()
 
 
 def main():
@@ -140,7 +167,7 @@ def draw_points(screen, phys_points_coord, math_points_coord):
         x, y = point
         pygame.draw.circle(screen,
                            points_color,
-                           (int(x + SCREEN_WIDTH // 4), int(-10 * y) + SCREEN_HEIGHT // 2),
+                           (int(x + SCREEN_WIDTH // 4), int(10 * y) + SCREEN_HEIGHT // 2),
                            POINT_RADIUS)
 
 
