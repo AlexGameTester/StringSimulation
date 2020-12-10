@@ -151,7 +151,7 @@ class PhysicalSimulator(Simulator):
 
         return physical_simulation
 
-    def simulate(self):
+    def simulate(self, progressbar):
         """simulates an interaction between all points of the cord"""
         length = SCREEN_WIDTH // 2
         coefficient = (self.speed_of_sound ** 2 * self.amount_of_points *
@@ -171,7 +171,14 @@ class PhysicalSimulator(Simulator):
                                    coefficient, length_0, self.delta_time)
                     point.move(self.delta_time)
                 point.make_a_record()
+
+            if i % 100 == 0:
+                progressbar.set_percentage(phys_percentage=i / self.calc_count)
             i += 1
+
+        progressbar.set_percentage(phys_percentage=1)
+
+        progressbar.phys_finished()
 
     def draw(self, screen):
         """

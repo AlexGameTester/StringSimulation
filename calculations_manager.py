@@ -8,6 +8,8 @@ import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
 import threading
+import os
+import image_reading
 
 
 class SimulationParameters:
@@ -128,6 +130,9 @@ class CalculationsManager:
     """
     fps = 400  # TODO: maybe put it somewhere else
 
+    text_extensions = ['.txt']
+    image_extensions = ['.png']
+
     def __init__(self, manager, params: StartParameters):
         self.manager = manager
         self.start_parameters = params
@@ -230,7 +235,7 @@ class CalculationsManager:
                 pb.set_percentage(phys_percentage=0.05 * i)
 
         math_thread = threading.Thread(target=self._mathematical_simulator.simulate, args=(pb,))
-        phys_thread = threading.Thread(target=dummy, args=(pb,))
+        phys_thread = threading.Thread(target=self._physical_simulator.simulate, args=(pb,))
 
         math_thread.start()
         phys_thread.start()
