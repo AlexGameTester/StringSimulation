@@ -3,7 +3,7 @@ from pkg_resources import WorkingSet , DistributionNotFound
 working_set = WorkingSet()
 #check whether required modules are active.
 try: 
-    working_set.require('pygame', 'numpy', 'time', 'matplotlib', 'typing')
+    working_set.require('pygame', 'numpy','time', 'matplotlib', 'typing')
 except DistributionNotFound:
     print("Seems that some required python modules were not found," 
         " check for availability: \nnumpy \npygame \ntime \nmatplotlib \ntyping")
@@ -33,7 +33,7 @@ class StartParameters:
         self.precision = precision
         self.method = method
         self.file_picked = file_picked
-        self.data = [speed_of_sound, simulation_time, number_of_points, precision, method]
+        self.data = [speed_of_sound, simulation_time, number_of_points, precision, method, file_picked]
 
 
 class InputWindow:
@@ -134,22 +134,22 @@ class InputWindow:
 
             messagebox.showerror("Non-integer value validation error",
                                  "Please check whether number of points and precision parameters are integers")
-        elif getint(self.points_entry.get()) > 1000:
+        elif getint(self.points_entry.get()) > 1000: ##number of points validation <=3
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the number of points in a chain is less or equal than 1000")
-        elif getint(self.precision_entry.get()) > 1000:
+        elif getint(self.precision_entry.get()) > 1000: #precision validation <=1000
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the precision parameter is less or equal than 1000")
-        elif getint(self.points_entry.get()) < 3: #number of points validation - >= 3
+        elif getint(self.points_entry.get()) < 3: #number of points validation >= 3
             
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the number of points in a chain is greater or equal than 3")
         elif getint(self.precision_entry.get()) < 10: #precision must be >= 10 validation
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the precision parameter is greater or equal than 20")                         
+                                 "Please check whether the precision parameter is greater or equal than 10")                         
         elif getdouble(text1) > 343: #speed of sound must be <= 343 validation
 
             messagebox.showerror("Parameter is out of range",
@@ -158,7 +158,7 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is greater or equal than 5")
-        elif getdouble(text2) > 100: #simulation time must be < 100 validation
+        elif getdouble(text2) > 100: #simulation time must be <= 100 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the simulation time within the required range")
@@ -169,7 +169,7 @@ class InputWindow:
         elif self.filename == None:
             
             messagebox.showerror("No file picked",
-                                 "")
+                                 "Please check whether you have picked file with input parameters")
         else:
             c = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4),
                                 method=self.pick.get(), file_picked=self.filename)
