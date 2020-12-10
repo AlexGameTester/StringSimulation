@@ -63,7 +63,7 @@ class MathematicalSimulator(Simulator):
     def get_method(self) -> Callable[[None], None]:
         pass
 
-    def simulate(self):
+    def simulate(self, progressbar):
         """
         Initial implementation of simulation process. **Blocks program execution**
         """
@@ -72,8 +72,17 @@ class MathematicalSimulator(Simulator):
             finished = self._fourier_solver.calculate_next()
         points_at = self._fourier_solver.get_points_function()
 
-        for i in range(self._simulation_time):
+        i = 0
+        while i < self._simulation_time:
             self._calculated_points.append(points_at(i, self._number_of_points))
+
+            if i % 100 == 0:
+                progressbar.set_percentage(math_percentage=i / self._simulation_time)
+
+            i += 1
+
+        progressbar.set_percentage(math_percentage=1)
+        progressbar.math_finished()
 
     def get_simulation(self) -> Simulation:
         return MathSimulation(self._calculated_points)

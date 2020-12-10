@@ -40,4 +40,14 @@ class Simulator(ABC):
         """
         pass
 
+    @abstractmethod
+    def simulate(self, progressbar):
+        """
+        Starts a simulation.
+        Periodically sends completion percentage to progressbar
+
+        :param progressbar: a ProgressBar instance
+        """
+        pass
+
 

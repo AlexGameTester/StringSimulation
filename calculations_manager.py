@@ -65,6 +65,11 @@ class ProgressBar:
     label_text = '  {}%  '
 
     def __init__(self):
+        self._math_percentage = 0
+        self._math_finished = False
+        self._phys_percentage = 0
+        self._phys_finished = False
+
         app = tk.Tk()
 
         self.app = app
@@ -81,21 +86,40 @@ class ProgressBar:
         self.pb_label.grid(row=0, column=0, padx=(30, 30), pady=(40, 0))
         self.pb_label['text'] = self.label_text.format(0)
 
+
     def start(self):
         self.app.mainloop()
 
-    def set_percentage(self, percentage: float):
+    def set_percentage(self, **kwargs):
         """
         Called when percentage of completion of calculations is changed to show it
 
-        :param percentage: a percentage of completion of calculations
+        :keyword math_percentage: percentage of completion of mathematical simulation. float from [0,1]
+        :keyword phys_percentage: percentage of completion of physical simulation. float from [0,1]
         """
         assert self.progressbar
         assert self.pb_label
+        if 'math_percentage' in kwargs:
+            self._math_percentage = kwargs['math_percentage']
+
+        if 'phys_percentage' in kwargs:
+            self._phys_percentage = kwargs['phys_percentage']
+
+        percentage = (self._math_percentage + self._phys_percentage) / 2
 
         val = int(percentage * 100)
         self.progressbar['value'] = val
         self.pb_label['text'] = self.label_text.format(val)
+
+    def math_finished(self):
+        self._math_finished = True
+        if self._math_finished and self._phys_finished:
+            self.app.destroy()
+
+    def phys_finished(self):
+        self._phys_finished = True
+        if self._math_finished and self._phys_finished:
+            self.app.destroy()
 
 
 class CalculationsManager:
@@ -149,8 +173,23 @@ class CalculationsManager:
         self._physical_simulator = make_phys()
         self._mathematical_simulator = MathematicalSimulator(sim_params)
 
-        self._physical_simulator.simulate()
-        self._mathematical_simulator.simulate()
+        pb = ProgressBar()
+
+        def dummy(pb):
+            for i in range(7):
+                sleep(2)
+                pb.set_percentage(phys_percentage=0.05 * i)
+
+        math_thread = threading.Thread(target=self._mathematical_simulator.simulate, args=(pb,))
+        phys_thread = threading.Thread(target=dummy, args=(pb,))
+
+        math_thread.start()
+        phys_thread.start()
+        # math_thread.join()
+        # phys_thread.join()
+        pb.start()
+        # self._physical_simulator.simulate()
+        # self._mathematical_simulator.simulate()
 
         self._end_calculation()
 
@@ -167,18 +206,3 @@ class CalculationsManager:
         self.manager.set_simulations(math_simulation=math_sim, phys_simulation=phys_sim)
 
         self.manager.on_calculation_ended()
-
-
-def main():
-    def func(pb):
-        for i in range(3):
-            sleep(3)
-            pb.set_percentage(0.05 * i)
-    pb = ProgressBar()
-    thr = threading.Thread(target=func, args=(pb,))
-    thr.start()
-    pb.start()
-
-
-if __name__ == "__main__":
-    main()
