@@ -61,7 +61,6 @@ def read_points(path: str, length=400, max_y=1):
     complex_points = _normalize_points(complex_points)
 
     max_y_before = np.max(np.abs(complex_points.imag))
-    print(max_y_before)
     scale_y = max_y / max_y_before
 
     return complex_points.real, complex_points.imag * scale_y
@@ -70,6 +69,8 @@ def read_points(path: str, length=400, max_y=1):
 def main():
     path = 'test_image.png'
     x, y = read_points(path)
+    print('X', type(x))
+    print('Y', type(y))
     import matplotlib.pyplot as plt
     plt.plot(x, y)
     plt.show()

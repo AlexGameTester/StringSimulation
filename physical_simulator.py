@@ -119,12 +119,25 @@ class PhysicalSimulator(Simulator):
         self.counts_per_frame = int(1 / self.delta_time)
         self.calc_count = params.simulation_time * self.counts_per_frame
 
+        ratio = int(len(params.initial_positions_x) / params.number_of_points)
+        point_number = 0
+
         for number, point in enumerate(zip(params.initial_positions_x,
                                            params.initial_positions_y,
                                            params.initial_velocities_y)):
-            x, y, y_velocity = point
-            point = Point(x, y, y_velocity, number)
-            self.points.append(point)
+            if number % ratio != 0 or point_number >= params.number_of_points - 1:
+                continue
+            else:
+                x, y, y_velocity = point
+                point = Point(x, y, y_velocity, point_number)
+                self.points.append(point)
+                point_number += 1
+
+        def last(arr):
+            return arr[len(arr) - 1]
+
+        self.points.append(Point(last(params.initial_positions_x), last(params.initial_positions_y),
+                                 last(params.initial_velocities_y), params.number_of_points - 1))
 
     def get_method(self) -> Callable[[float], None]:
         pass

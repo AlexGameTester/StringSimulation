@@ -48,12 +48,12 @@ class InputWindow:
             return True
     
     def pickfile(self):
-        filename1 = filedialog.askopenfilename(parent=self.app, initialdir = "/",title = "Select a file with input parameters",
-                                                filetypes = (("txt files","*.txt"),))
+        filename1 = filedialog.askopenfilename(parent=self.app, initialdir="./",
+                                               title="Select a file with input parameters",
+                                               filetypes=(("txt files", "*.txt"), ('png files', '*.png')))
         if filename1:
             self.filename = filename1
 
-    
     def get_parameters(self) -> StartParameters:
         """
         Reads data from the window, validates it and transforms it into a list of parameters
@@ -143,7 +143,7 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text1) < 5: #speed of sound must be >= 5 validation
+        elif getdouble(text1) <= 0: #speed of sound must be > 0 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is greater or equal than 5")

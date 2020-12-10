@@ -1,9 +1,10 @@
+import image_reading
 from inputwindow import StartParameters
 from math_simulator import MathematicalSimulator
 from physical_simulator import PhysicalSimulator
 
 import numpy as np
-import math
+import os
 
 
 class SimulationParameters:
@@ -69,6 +70,8 @@ class CalculationsManager:
     Controls process of simulation of the system
     """
     fps = 400  # TODO: maybe put it somewhere else
+    text_extensions = ['.txt']
+    image_extensions = ['.png']
 
     def __init__(self, manager, params: StartParameters):
         self.manager = manager
@@ -82,6 +85,8 @@ class CalculationsManager:
 
         :return: a SimulationParameters instance with set parameters
         """
+
+        '''
         def create_init_params():
             length = 900 / 2
             max_velocity = 0.4
@@ -101,10 +106,10 @@ class CalculationsManager:
                     points.write(point)
 
                     x += delta_r
-
-        def read_parameters():
+        '''
+        def read_parameters(path):
             x = y = y_velocity = np.array([])
-            with open("physical_points.txt") as points_file:
+            with open(path) as points_file:
                 for data_string in points_file:
                     point_x, point_y, point_y_velocity = data_string.split()
                     x = np.append(x, float(point_x))
@@ -112,12 +117,22 @@ class CalculationsManager:
                     y_velocity = np.append(y_velocity, float(point_y_velocity))
             return x, y, y_velocity
 
+
         start_params = self.start_parameters
 
         sim_time = int(start_params.simulation_time * self.fps)
 
-        create_init_params()
-        x_params, y_params, y_velocity_params = read_parameters()
+        # create_init_params()
+        file_picked = start_params.file_picked
+        file, ext = os.path.splitext(file_picked)
+
+        if ext in self.text_extensions:
+            x, y, y_vel = read_parameters(file_picked)
+        elif ext in self.image_extensions:
+            x, y = image_reading.read_points(file_picked, length=450, max_y=8)
+            y_vel = y * 0
+        else:
+            raise ValueError()
 
         '''
         x = np.linspace(0, 300, 2000)
@@ -127,7 +142,7 @@ class CalculationsManager:
         y_ = x * 0
         '''
         return SimulationParameters(sim_time, start_params.speed_of_sound,
-                                    x_params, y_params, y_velocity_params, start_params.precision,
+                                    x, y, y_vel, start_params.precision,
                                     number_of_points=start_params.number_of_points)
 
     def start_calculation(self):
