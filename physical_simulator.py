@@ -3,6 +3,7 @@ import math
 import time
 
 import pygame
+import numpy as np
 
 from simulation import Simulation
 from simulator import Simulator
@@ -122,22 +123,21 @@ class PhysicalSimulator(Simulator):
         ratio = int(len(params.initial_positions_x) / params.number_of_points)
         point_number = 0
 
-        for number, point in enumerate(zip(params.initial_positions_x,
-                                           params.initial_positions_y,
-                                           params.initial_velocities_y)):
-            if number % ratio != 0 or point_number >= params.number_of_points - 1:
-                continue
-            else:
-                x, y, y_velocity = point
-                point = Point(x, y, y_velocity, point_number)
-                self.points.append(point)
-                point_number += 1
+        x_linted = np.linspace(0, params.string_length, params.number_of_points)
+        y_linted = np.interp(x_linted, params.initial_positions_x, params.initial_positions_y)
+        y_linted[0] = 0
+        y_linted[len(y_linted) - 1] = 0
 
-        def last(arr):
-            return arr[len(arr) - 1]
+        y_vel_linted = np.interp(x_linted, params.initial_positions_x, params.initial_velocities_y)
+        y_vel_linted[0] = 0
+        y_vel_linted[len(y_vel_linted) - 1] = 0
 
-        self.points.append(Point(last(params.initial_positions_x), last(params.initial_positions_y),
-                                 last(params.initial_velocities_y), params.number_of_points - 1))
+        for number, point in enumerate(zip(x_linted,
+                                           y_linted,
+                                           y_vel_linted)):
+            x, y, y_velocity = point
+            point = Point(x, y, y_velocity, number)
+            self.points.append(point)
 
     def get_method(self) -> Callable[[float], None]:
         pass
@@ -152,7 +152,6 @@ class PhysicalSimulator(Simulator):
         return physical_simulation
 
     def simulate(self, progressbar):
-        """simulates an interaction between all points of the cord"""
         length = SCREEN_WIDTH // 2
         coefficient = (self.speed_of_sound ** 2 * self.amount_of_points *
                        (self.amount_of_points - 1) / (length ** 2 * (1 - ALPHA)))
