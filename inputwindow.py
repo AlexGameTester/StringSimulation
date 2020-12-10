@@ -1,26 +1,28 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
 
 
 class StartParameters:
     """Starting parameter which are set by the user.
 
     :param speed_of_sound: speed of sound in a material of a string. Less or equal than 343
-    :param simulation_time: simulation modelling duration in seconds. Less or equal than 100
+    :param simulation_time: simulation modelling duration. Less or equal than 100
     :param number_of_points: number of points in a string which will be modelled. Less or equal than 1000
     :param precision: parameter which affects the step with which modelling will be done. Less or equal than 1000.
     :param method: solution method of wave equation. Options: Fourier,
 
     """
 
-    def __init__(self, speed_of_sound, simulation_time, number_of_points, precision, method):
+    def __init__(self, speed_of_sound, simulation_time, number_of_points, precision, method, file_picked):
         self.speed_of_sound = speed_of_sound
         self.simulation_time = simulation_time
         self.number_of_points = number_of_points
         self.precision = precision
         self.method = method
-        self.data = [speed_of_sound, simulation_time, number_of_points, precision, method]
+        self.file_picked = file_picked
+        self.data = [speed_of_sound, simulation_time, number_of_points, precision, method, file_picked]
 
 
 class InputWindow:
@@ -44,6 +46,13 @@ class InputWindow:
             return False
         else:
             return True
+    
+    def pickfile(self):
+        filename1 = filedialog.askopenfilename(parent=self.app, initialdir = "/",title = "Select a file with input parameters",
+                                                filetypes = (("txt files","*.txt"),))
+        if filename1:
+            self.filename = filename1
+
     
     def get_parameters(self) -> StartParameters:
         """
@@ -114,31 +123,31 @@ class InputWindow:
 
             messagebox.showerror("Non-integer value validation error",
                                  "Please check whether number of points and precision parameters are integers")
-        elif getint(self.points_entry.get()) > 1000:
+        elif getint(self.points_entry.get()) > 1000: ##number of points validation <=3
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the number of points in a chain is less or equal than 1000")
-        elif getint(self.precision_entry.get()) > 1000:
+        elif getint(self.precision_entry.get()) > 1000: #precision validation <=1000
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the precision parameter is less or equal than 1000")
-        elif getint(self.points_entry.get()) < 3: #number of points validation - >= 3
+        elif getint(self.points_entry.get()) < 3: #number of points validation >= 3
             
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the number of points in a chain is greater or equal than 3")
         elif getint(self.precision_entry.get()) < 10: #precision must be >= 10 validation
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the precision parameter is greater or equal than 20")                         
+                                 "Please check whether the precision parameter is greater or equal than 10")                         
         elif getdouble(text1) > 343: #speed of sound must be <= 343 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text1) < 1: #speed of sound must be >= 1 validation
+        elif getdouble(text1) < 5: #speed of sound must be >= 5 validation
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the speed of sound in material is greater or equal than 5 m/s")
-        elif getdouble(text2) > 100: #simulation time must be < 100 validation
+                                 "Please check whether the speed of sound in material is greater or equal than 5")
+        elif getdouble(text2) > 100: #simulation time must be <= 100 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the simulation time within the required range")
@@ -146,9 +155,14 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the simulation time is greater or equal than 5")
+        elif self.filename == None:
+            
+            messagebox.showerror("No file picked",
+                                 "Please check whether you have picked file with input parameters")
         else:
             c = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4),
-                                method=self.pick.get())
+                                method=self.pick.get(), file_picked=self.filename)
+            print(c.file_picked)
             return c
 
     def __init__(self, manager):
@@ -159,7 +173,8 @@ class InputWindow:
         self.app = app
         self.app.geometry('400x250')
         self.app.resizable(width=False, height=False)
-
+        self.filename = None
+        
         validate_command = (self.app.register(self.onValidate), '%i')
 
         center_frame = Frame(self.app)
@@ -201,6 +216,9 @@ class InputWindow:
         button1 = Button(center_frame, command=self._start, width=10,
                          height=2, font=18, text="Start")
         button1.grid(row=5)
+        
+        button_pick_file = Button(center_frame, width=10, height=1, command=self.pickfile, text="File menu")
+        button_pick_file.grid(row=6, column=1)
 
         button2 = Button(center_frame, command=self.exit1, width=4, height=1, font=18,
                          text="Quit")
