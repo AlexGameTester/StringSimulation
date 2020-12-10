@@ -115,11 +115,7 @@ class PhysicalSimulator(Simulator):
 
         self.speed_of_sound = params.speed_of_sound
         self.amount_of_points = params.number_of_points
-        self.delta_time = 1 / params.accuracy * 3
-        self.drawing_step = int(3 / self.delta_time / 1000)
-        if self.drawing_step == 0:
-            self.drawing_step = 1
-        # self.calc_count = params.simulation_time * self.drawing_step
+        self.delta_time = 1 / (100 + params.accuracy)
         self.counts_per_frame = int(1 / self.delta_time)
         self.calc_count = params.simulation_time * self.counts_per_frame
 
@@ -137,7 +133,8 @@ class PhysicalSimulator(Simulator):
         """
         creates and returns an object of PhysicalSimulation class
         """
-        physical_simulation = PhysicalSimulation(self.calc_count // self.counts_per_frame, self.counts_per_frame, self.points)
+        physical_simulation = PhysicalSimulation(self.calc_count // self.counts_per_frame,
+                                                 self.counts_per_frame, self.points)
 
         return physical_simulation
 
@@ -152,12 +149,12 @@ class PhysicalSimulator(Simulator):
         while i < self.calc_count:
             for point in self.points:
                 if point.number != 0 and point.number != len(self.points) - 1:
-                    p1 = self.points[point.number - 1]
-                    p2 = self.points[point.number + 1]
-                    point.interact(p1.x,
-                                   p1.y,
-                                   p2.x,
-                                   p2.y,
+                    left_point_number = self.points[point.number - 1]
+                    right_point_number = self.points[point.number + 1]
+                    point.interact(left_point_number.x,
+                                   left_point_number.y,
+                                   right_point_number.x,
+                                   right_point_number.y,
                                    coefficient, length_0, self.delta_time)
                     point.move(self.delta_time)
                 point.make_a_record()
@@ -175,16 +172,16 @@ class PhysicalSimulator(Simulator):
                 x, y = point.coordinates[self.my_time]
                 pygame.draw.circle(screen,
                                    BLACK,
-                                   (int(x), int(y)),
+                                   (int(x), int(10 * (y - SCREEN_HEIGHT // 2) + SCREEN_HEIGHT // 2)),
                                    POINT_RADIUS)
             else:
                 x, y = point.coordinates[0]
                 pygame.draw.circle(screen,
                                    BLACK,
-                                   (int(x), int(y)),
+                                   (int(x), int(10 * (y - SCREEN_HEIGHT // 2) + SCREEN_HEIGHT // 2)),
                                    POINT_RADIUS)
-        if self.my_time < self.calc_count - self.drawing_step:
-            self.my_time += self.drawing_step
+        if self.my_time < self.calc_count - 30:
+            self.my_time += 30
             return False
         else:
             time.sleep(3)
