@@ -29,6 +29,7 @@ class AnimationWindow:
         self._phys_simulation = phys_simulation
 
         self.animation_time = 0
+        self.playback_speed = 1.0
         self.paused = False
         self.finished = False
         self.screen = None
@@ -36,10 +37,18 @@ class AnimationWindow:
     def playback_control(self, event):
         key_pause = pygame.K_p
         key_restart = pygame.K_r
+        key_quit = pygame.K_ESCAPE
+
         key_backwards = pygame.K_LEFT
         key_forward = pygame.K_RIGHT
-        key_quit = pygame.K_ESCAPE
         step = 300
+
+        key_speedup = pygame.K_UP
+        key_speeddown = pygame.K_DOWN
+        key_reset_speed = pygame.K_s
+        speed_step = 0.2
+        min_speed = speed_step
+        max_speed = 5
 
         assert self.screen
 
@@ -54,10 +63,16 @@ class AnimationWindow:
                 self.animation_time = max(0, self.animation_time - step)
                 self.draw_frame()
             elif key == key_forward:
-                self.animation_time = min(self._math_simulation.simulation_time, self.animation_time + step)
+                self.animation_time = min(self._math_simulation.simulation_time - 1, self.animation_time + step)
                 self.draw_frame()
             elif key == key_quit:
                 self.finished = True
+            elif key == key_speedup:
+                self.playback_speed = min(max(min_speed, self.playback_speed + speed_step), max_speed)
+            elif key == key_speeddown:
+                self.playback_speed = min(max(min_speed, self.playback_speed - speed_step), max_speed)
+            elif key == key_reset_speed:
+                self.playback_speed = 1
 
     def start_animation(self):
         """
@@ -84,13 +99,14 @@ class AnimationWindow:
 
             if self.animation_time < self._math_simulation.simulation_time and not self.paused:
                 self.draw_frame()
-                self.animation_time += DRAWING_STEP
+                self.animation_time = self.playback_speed + self.animation_time
 
             pygame.display.set_caption(str(clock.get_fps()))
 
     def draw_frame(self):
-        phys_points_coord = self._phys_simulation.get_points_at(self.animation_time)
-        math_points_coord = self._math_simulation.get_points_at(self.animation_time)
+        frame_number = int(self.animation_time)
+        phys_points_coord = self._phys_simulation.get_points_at(frame_number)
+        math_points_coord = self._math_simulation.get_points_at(frame_number)
         draw_points(self.screen, phys_points_coord, math_points_coord)
 
         pygame.display.update()
