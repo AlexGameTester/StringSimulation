@@ -145,7 +145,7 @@ class PhysicalSimulator(Simulator):
 
         return physical_simulation
 
-    def simulate(self, percentage, finished):
+    def simulate(self, percentage, finished, queue):
         length = SCREEN_WIDTH // 2
         coefficient = (self.speed_of_sound ** 2 * self.amount_of_points *
                        (self.amount_of_points - 1) / (length ** 2 * (1 - ALPHA)))
@@ -171,6 +171,8 @@ class PhysicalSimulator(Simulator):
             i += 1
 
         percentage.value = 1
+
+        queue.put(('phys', self))
 
         finished.value = True
 

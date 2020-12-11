@@ -55,10 +55,13 @@ class MathematicalSimulator(Simulator):
                                             + accuracy / accuracy_divider * start_points_number)
         print('Number of sum elements is', self._fourier_sum_elements_number)
 
-    def simulate(self, percentage, finished):
+    def simulate(self, percentage, finished, queue):
         """
         Initial implementation of simulation process. **Blocks program execution**
         """
+        print('Simulation started', len(self._calculated_points))
+        print('Simulation started. Self object is', self)
+
         calc_finished = False
         while not calc_finished:
             calc_finished = self._fourier_solver.calculate_next()
@@ -74,6 +77,11 @@ class MathematicalSimulator(Simulator):
             i += 1
 
         percentage.value = 1
+
+        print('Simulation finished', len(self._calculated_points))
+        print('Simulation finished. Self object is', self)
+
+        queue.put(('math', self))
 
         finished.value = True
 

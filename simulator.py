@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from multiprocessing import Value
+import multiprocessing as mp
 
 from simulation import Simulation
 
@@ -23,7 +23,7 @@ class Simulator(ABC):
         pass
 
     @abstractmethod
-    def simulate(self, percentage: Value, finished: Value):
+    def simulate(self, percentage: mp.Value, finished: mp.Value, queue: mp.Queue):
         """
         Starts a simulation.
         Periodically sends completion percentage to progressbar

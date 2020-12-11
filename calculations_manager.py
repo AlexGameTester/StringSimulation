@@ -222,19 +222,36 @@ class CalculationsManager:
 
         # math_thread = threading.Thread(target=self._mathematical_simulator.simulate, args=(pb,))
         # phys_thread = threading.Thread(target=self._physical_simulator.simulate, args=(pb,))
+        print('Object before', self._mathematical_simulator)
+        print('Before', len(self._mathematical_simulator._calculated_points))
+
+        result_queue = mp.Queue()
 
         math_thread = mp.Process(target=self._mathematical_simulator.simulate, args=(pb.math_percentage,
-                                                                                     pb.math_finished))
+                                                                                     pb.math_finished,
+                                                                                     result_queue))
         phys_thread = mp.Process(target=self._physical_simulator.simulate, args=(pb.phys_percentage,
-                                                                                 pb.phys_finished))
+                                                                                 pb.phys_finished,
+                                                                                 result_queue))
 
         math_thread.start()
         phys_thread.start()
-        # math_thread.join()
-        # phys_thread.join()
+        print('Created processes')
         pb.start()
-        # self._physical_simulator.simulate()
-        # self._mathematical_simulator.simulate()
+
+        r1, r2 = result_queue.get(), result_queue.get()
+
+        math_thread.join()
+        phys_thread.join()
+
+        for type_, obj_ in [r1, r2]:
+            if type_ == 'math':
+                self._mathematical_simulator = obj_
+            else:
+                self._physical_simulator = obj_
+
+        print('Object after', self._mathematical_simulator)
+        print('After', len(self._mathematical_simulator._calculated_points))
 
         self._end_calculation()
 
@@ -247,6 +264,8 @@ class CalculationsManager:
 
         phys_sim = self._physical_simulator.get_simulation()
         math_sim = self._mathematical_simulator.get_simulation()
+
+        print('After getting sim', len(self._mathematical_simulator._calculated_points))
 
         self.manager.set_simulations(math_simulation=math_sim, phys_simulation=phys_sim)
 
