@@ -7,9 +7,10 @@ from physical_simulator import PhysicalSimulator
 import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
-import threading
+import multiprocessing as mp
 import os
 import image_reading
+import ctypes
 
 
 class SimulationParameters:
@@ -67,10 +68,10 @@ class ProgressBar:
     label_text = '  {}%  '
 
     def __init__(self):
-        self._math_percentage = 0
-        self._math_finished = False
-        self._phys_percentage = 0
-        self._phys_finished = False
+        self.math_percentage = mp.Value(ctypes.c_float, 0.0)
+        self.math_finished = mp.Value(ctypes.c_bool, False)
+        self.phys_percentage = mp.Value(ctypes.c_float, 0.0)
+        self.phys_finished = mp.Value(ctypes.c_bool, False)
 
         app = tk.Tk()
 
@@ -87,44 +88,27 @@ class ProgressBar:
         self.pb_label = tk.Label(main_frame)
         self.pb_label.grid(row=0, column=0, padx=(30, 30), pady=(40, 0))
         self.pb_label['text'] = self.label_text.format(0)
-
+        self._job_id = None
 
     def start(self):
+        self.start_updating()
         self.app.mainloop()
 
-    def set_percentage(self, **kwargs):
-        """
-        Called when percentage of completion of calculations is changed to show it
+    def start_updating(self):
+        delay = 100
 
-        :keyword math_percentage: percentage of completion of mathematical simulation. float from [0,1]
-        :keyword phys_percentage: percentage of completion of physical simulation. float from [0,1]
-        """
-        assert self.progressbar
-        assert self.pb_label
-        if 'math_percentage' in kwargs:
-            self._math_percentage = kwargs['math_percentage']
+        def update():
+            val = int(100 * 1/2 * (self.math_percentage.value + self.phys_percentage.value))
+            self.progressbar['value'] = val
+            self.pb_label['text'] = self.label_text.format(val)
 
-        if 'phys_percentage' in kwargs:
-            self._phys_percentage = kwargs['phys_percentage']
+            if self.phys_finished.value and self.math_finished.value:
+                if self._job_id:
+                    self.app.after_cancel(self._job_id)
+                self.app.destroy()
+            self.app.after(delay, update)
 
-        percentage = (self._math_percentage + self._phys_percentage) / 2
-
-        val = int(percentage * 100)
-        # TODO: put it in separate function that is called periodically
-        self.progressbar['value'] = val
-        self.pb_label['text'] = self.label_text.format(val)
-
-    def math_finished(self):
-        self._math_finished = True
-        if self._math_finished and self._phys_finished:
-            # TODO: put it in separate function that is called periodically
-            self.app.destroy()
-
-    def phys_finished(self):
-        self._phys_finished = True
-        if self._math_finished and self._phys_finished:
-            # TODO: put it in separate function that is called periodically
-            self.app.destroy()
+        self._job_id = self.app.after(delay, update)
 
 
 class CalculationsManager:
@@ -179,7 +163,6 @@ class CalculationsManager:
                     y = np.append(y, float(point_y))
                     y_velocity = np.append(y_velocity, float(point_y_velocity))
             return x, y, y_velocity
-
 
         start_params = self.start_parameters
 
@@ -237,8 +220,13 @@ class CalculationsManager:
                 sleep(2)
                 pb.set_percentage(phys_percentage=0.05 * i)
 
-        math_thread = threading.Thread(target=self._mathematical_simulator.simulate, args=(pb,))
-        phys_thread = threading.Thread(target=self._physical_simulator.simulate, args=(pb,))
+        # math_thread = threading.Thread(target=self._mathematical_simulator.simulate, args=(pb,))
+        # phys_thread = threading.Thread(target=self._physical_simulator.simulate, args=(pb,))
+
+        math_thread = mp.Process(target=self._mathematical_simulator.simulate, args=(pb.math_percentage,
+                                                                                     pb.math_finished))
+        phys_thread = mp.Process(target=self._physical_simulator.simulate, args=(pb.phys_percentage,
+                                                                                 pb.phys_finished))
 
         math_thread.start()
         phys_thread.start()

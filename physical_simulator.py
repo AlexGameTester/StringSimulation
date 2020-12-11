@@ -145,7 +145,7 @@ class PhysicalSimulator(Simulator):
 
         return physical_simulation
 
-    def simulate(self, progressbar):
+    def simulate(self, percentage, finished):
         length = SCREEN_WIDTH // 2
         coefficient = (self.speed_of_sound ** 2 * self.amount_of_points *
                        (self.amount_of_points - 1) / (length ** 2 * (1 - ALPHA)))
@@ -167,12 +167,12 @@ class PhysicalSimulator(Simulator):
                     point.make_a_record()
 
             if i % 500 == 0:
-                progressbar.set_percentage(phys_percentage=i / self.calc_count)
+                percentage.value = i / self.calc_count
             i += 1
 
-        progressbar.set_percentage(phys_percentage=1)
+        percentage.value = 1
 
-        progressbar.phys_finished()
+        finished.value = True
 
     def draw(self, screen):
         """

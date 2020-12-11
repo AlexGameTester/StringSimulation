@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from multiprocessing import Value
 
 from simulation import Simulation
 
@@ -23,12 +23,13 @@ class Simulator(ABC):
         pass
 
     @abstractmethod
-    def simulate(self, progressbar):
+    def simulate(self, percentage: Value, finished: Value):
         """
         Starts a simulation.
         Periodically sends completion percentage to progressbar
 
-        :param progressbar: a ProgressBar instance
+        :param percentage: TODO: Docs
+        :param finished:
         """
         pass
 
