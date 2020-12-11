@@ -87,21 +87,25 @@ class AnimationWindow:
         assert self._math_simulation.simulation_time == self._phys_simulation.simulation_time, \
             'Math: {}, Phys: {}'.format(self._math_simulation.simulation_time,
                                         self._phys_simulation.simulation_time)
+        try:
+            while not self.finished:
+                clock.tick(FPS)
 
-        while not self.finished:
-            clock.tick(FPS)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.finished = True
+                    else:
+                        self.playback_control(event)
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.finished = True
-                else:
-                    self.playback_control(event)
+                if self.animation_time < self._math_simulation.simulation_time and not self.paused:
+                    self.draw_frame()
+                    self.animation_time = self.playback_speed + self.animation_time
 
-            if self.animation_time < self._math_simulation.simulation_time and not self.paused:
-                self.draw_frame()
-                self.animation_time = self.playback_speed + self.animation_time
+                pygame.display.set_caption(str(clock.get_fps()))
 
-            pygame.display.set_caption(str(clock.get_fps()))
+            pygame.quit()
+        finally:
+            pygame.quit()
 
     def draw_frame(self):
         frame_number = int(self.animation_time)
