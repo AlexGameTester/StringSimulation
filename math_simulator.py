@@ -22,9 +22,6 @@ class MathematicalSimulator(Simulator):
     Represents a mathematical way to simulate the process
     """
 
-    def get_completion_percentage(self) -> float:
-        pass
-
     def __init__(self, params):
         """
         Creates MathematicalSimulator instance
@@ -57,12 +54,6 @@ class MathematicalSimulator(Simulator):
         self._fourier_sum_elements_number = int(min_fourier_sum_elements_number \
                                             + accuracy / accuracy_divider * start_points_number)
         print('Number of sum elements is', self._fourier_sum_elements_number)
-
-    def _method(self):
-        pass
-
-    def get_method(self) -> Callable[[None], None]:
-        pass
 
     def simulate(self, progressbar):
         """

@@ -110,17 +110,20 @@ class ProgressBar:
         percentage = (self._math_percentage + self._phys_percentage) / 2
 
         val = int(percentage * 100)
+        # TODO: put it in separate function that is called periodically
         self.progressbar['value'] = val
         self.pb_label['text'] = self.label_text.format(val)
 
     def math_finished(self):
         self._math_finished = True
         if self._math_finished and self._phys_finished:
+            # TODO: put it in separate function that is called periodically
             self.app.destroy()
 
     def phys_finished(self):
         self._phys_finished = True
         if self._math_finished and self._phys_finished:
+            # TODO: put it in separate function that is called periodically
             self.app.destroy()
 
 
