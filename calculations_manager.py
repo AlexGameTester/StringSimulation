@@ -69,6 +69,11 @@ class ProgressBar:
     app_geometry = '400x240'
     label_text = '  {}%  '
 
+    @staticmethod
+    def _play_music(path):
+        playsound(path)
+        ProgressBar._play_music(path)
+
     def __init__(self, on_closed):
         """
         Creates ProgressBar instance
@@ -80,7 +85,7 @@ class ProgressBar:
         self.phys_percentage = mp.Value(ctypes.c_float, 0.0)
         self.phys_finished = mp.Value(ctypes.c_bool, False)
 
-        self._music_thread = mp.Process(target=playsound, args=('music.mp3',))
+        self._music_thread = mp.Process(target=ProgressBar._play_music, args=('music.mp3',))
 
         self._on_closed = on_closed
 
@@ -109,9 +114,11 @@ class ProgressBar:
         self.app.mainloop()
 
     def close(self):
-        self._music_thread.terminate()
-        self._on_closed()
-        self.app.destroy()
+        try:
+            self._music_thread.terminate()
+            self._on_closed()
+        finally:
+            self.app.destroy()
 
     def start_updating(self):
         delay = 100
