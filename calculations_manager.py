@@ -1,5 +1,7 @@
 from time import sleep
 
+from playsound import playsound
+
 from inputwindow import StartParameters
 from math_simulator import MathematicalSimulator
 from physical_simulator import PhysicalSimulator
@@ -67,11 +69,20 @@ class ProgressBar:
     app_geometry = '400x240'
     label_text = '  {}%  '
 
-    def __init__(self):
+    def __init__(self, on_closed):
+        """
+        Creates ProgressBar instance
+
+        :param on_closed: () -> None function that is called when progressbar is closed before calculation ended
+        """
         self.math_percentage = mp.Value(ctypes.c_float, 0.0)
         self.math_finished = mp.Value(ctypes.c_bool, False)
         self.phys_percentage = mp.Value(ctypes.c_float, 0.0)
         self.phys_finished = mp.Value(ctypes.c_bool, False)
+
+        self._music_thread = mp.Process(target=playsound, args=('music.mp3',))
+
+        self._on_closed = on_closed
 
         app = tk.Tk()
 
@@ -79,6 +90,8 @@ class ProgressBar:
         app.title(self.app_title)
         app.geometry()
         app.resizable(False, False)
+
+        app.protocol('WM_DELETE_WINDOW', self.close)
 
         main_frame = tk.Frame(app)
         main_frame.pack(side=tk.TOP, fill='both')
@@ -92,7 +105,13 @@ class ProgressBar:
 
     def start(self):
         self.start_updating()
+        self._music_thread.start()
         self.app.mainloop()
+
+    def close(self):
+        self._music_thread.terminate()
+        self._on_closed()
+        self.app.destroy()
 
     def start_updating(self):
         delay = 100
@@ -105,7 +124,9 @@ class ProgressBar:
             if self.phys_finished.value and self.math_finished.value:
                 if self._job_id:
                     self.app.after_cancel(self._job_id)
-                self.app.destroy()
+
+                self.close()
+
             self.app.after(delay, update)
 
         self._job_id = self.app.after(delay, update)
@@ -125,6 +146,11 @@ class CalculationsManager:
         self.start_parameters = params
         self._physical_simulator = None
         self._mathematical_simulator = None
+
+        self._phys_thread = None
+        self._math_thread = None
+
+        self.canceled = False
 
     def _get_simulation_parameters(self) -> SimulationParameters:
         """
@@ -213,36 +239,32 @@ class CalculationsManager:
         self._physical_simulator = PhysicalSimulator(sim_params)
         self._mathematical_simulator = MathematicalSimulator(sim_params)
 
-        pb = ProgressBar()
+        pb = ProgressBar(self.on_progressbar_closed)
 
-        def dummy(pb):
-            for i in range(7):
-                sleep(2)
-                pb.set_percentage(phys_percentage=0.05 * i)
-
-        # math_thread = threading.Thread(target=self._mathematical_simulator.simulate, args=(pb,))
-        # phys_thread = threading.Thread(target=self._physical_simulator.simulate, args=(pb,))
         print('Object before', self._mathematical_simulator)
         print('Before', len(self._mathematical_simulator._calculated_points))
 
         result_queue = mp.Queue()
 
-        math_thread = mp.Process(target=self._mathematical_simulator.simulate, args=(pb.math_percentage,
-                                                                                     pb.math_finished,
-                                                                                     result_queue))
-        phys_thread = mp.Process(target=self._physical_simulator.simulate, args=(pb.phys_percentage,
-                                                                                 pb.phys_finished,
-                                                                                 result_queue))
+        self._math_thread = mp.Process(target=self._mathematical_simulator.simulate, args=(pb.math_percentage,
+                                                                                           pb.math_finished,
+                                                                                           result_queue))
+        self._phys_thread = mp.Process(target=self._physical_simulator.simulate, args=(pb.phys_percentage,
+                                                                                       pb.phys_finished,
+                                                                                       result_queue))
 
-        math_thread.start()
-        phys_thread.start()
+        self._math_thread.start()
+        self._phys_thread.start()
         print('Created processes')
         pb.start()
 
+        if self.canceled:
+            return
+
         r1, r2 = result_queue.get(), result_queue.get()
 
-        math_thread.join()
-        phys_thread.join()
+        self._math_thread.join()
+        self._phys_thread.join()
 
         for type_, obj_ in [r1, r2]:
             if type_ == 'math':
@@ -255,8 +277,12 @@ class CalculationsManager:
 
         self._end_calculation()
 
-    def _show_progress_bar(self):
-        pass
+    def on_progressbar_closed(self):
+        self.canceled = True
+        if self._math_thread:
+            self._math_thread.terminate()
+        if self._phys_thread:
+            self._phys_thread.terminate()
 
     def _end_calculation(self):
         assert self._physical_simulator
