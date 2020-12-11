@@ -113,10 +113,14 @@ class ProgressBar:
         self._music_thread.start()
         self.app.mainloop()
 
+    def is_finished(self):
+        return self.phys_finished.value and self.math_finished.value
+
     def close(self):
         try:
             self._music_thread.terminate()
-            self._on_closed()
+            if not self.is_finished():
+                self._on_closed()
         finally:
             self.app.destroy()
 
@@ -128,7 +132,7 @@ class ProgressBar:
             self.progressbar['value'] = val
             self.pb_label['text'] = self.label_text.format(val)
 
-            if self.phys_finished.value and self.math_finished.value:
+            if self.is_finished():
                 if self._job_id:
                     self.app.after_cancel(self._job_id)
 
