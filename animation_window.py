@@ -35,7 +35,7 @@ class AnimationWindow:
         self.screen = None
 
     def playback_control(self, event):
-        key_pause = pygame.K_p
+        key_pause = pygame.K_SPACE
         key_restart = pygame.K_r
         key_quit = pygame.K_ESCAPE
 
@@ -119,7 +119,7 @@ class AnimationWindow:
         pb_start_x = int(0.21 * SCREEN_WIDTH)
         pb_length_y = int(0.03 * SCREEN_HEIGHT)
         progress = self.current_frame / self._math_simulation.simulation_time
-        pb_length_x = int(0.57 * SCREEN_WIDTH * progress)
+        pb_length_x = int(0.58 * SCREEN_WIDTH * progress)
         pygame.draw.rect(self.screen, RED, [pb_start_x, pb_start_y, pb_length_x, pb_length_y])
 
     def draw_frame(self):
