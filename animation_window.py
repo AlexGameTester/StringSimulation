@@ -28,7 +28,7 @@ class AnimationWindow:
         self._math_simulation = math_simulation
         self._phys_simulation = phys_simulation
 
-        self.animation_time = 0
+        self.current_frame = 0
         self.playback_speed = 1.0
         self.paused = False
         self.finished = False
@@ -57,13 +57,13 @@ class AnimationWindow:
             if key == key_pause:
                 self.paused = not self.paused
             elif key == key_restart:
-                self.animation_time = 0
+                self.current_frame = 0
                 self.draw_frame()
             elif key == key_backwards:
-                self.animation_time = max(0, self.animation_time - step)
+                self.current_frame = max(0, self.current_frame - step)
                 self.draw_frame()
             elif key == key_forward:
-                self.animation_time = min(self._math_simulation.simulation_time - 1, self.animation_time + step)
+                self.current_frame = min(self._math_simulation.simulation_time - 1, self.current_frame + step)
                 self.draw_frame()
             elif key == key_quit:
                 self.finished = True
@@ -97,9 +97,9 @@ class AnimationWindow:
                     else:
                         self.playback_control(event)
 
-                if self.animation_time < self._math_simulation.simulation_time and not self.paused:
+                if self.current_frame < self._math_simulation.simulation_time and not self.paused:
                     self.draw_frame()
-                    self.animation_time = self.playback_speed + self.animation_time
+                    self.current_frame += self.playback_speed
 
                 pygame.display.set_caption(str(clock.get_fps()))
 
@@ -107,8 +107,27 @@ class AnimationWindow:
         finally:
             pygame.quit()
 
+    def _draw_playback_progress(self):
+        # frame
+        start_y = int(0.05 * SCREEN_HEIGHT)
+        start_x = int(0.2 * SCREEN_WIDTH)
+        length_y = int(0.05 * SCREEN_HEIGHT)
+        length_x = int(0.6 * SCREEN_WIDTH)
+        pygame.draw.rect(self.screen, BLACK, [start_x, start_y, length_x, length_y])
+        # progress bar
+        pb_start_y = int(0.06 * SCREEN_HEIGHT)
+        pb_start_x = int(0.21 * SCREEN_WIDTH)
+        pb_length_y = int(0.03 * SCREEN_HEIGHT)
+        progress = self.current_frame / self._math_simulation.simulation_time
+        pb_length_x = int(0.57 * SCREEN_WIDTH * progress)
+        pygame.draw.rect(self.screen, RED, [pb_start_x, pb_start_y, pb_length_x, pb_length_y])
+
     def draw_frame(self):
-        frame_number = int(self.animation_time)
+        frame_number = int(self.current_frame)
+        self.screen.fill(WHITE)
+
+        self._draw_playback_progress()
+
         phys_points_coord = self._phys_simulation.get_points_at(frame_number)
         math_points_coord = self._math_simulation.get_points_at(frame_number)
         draw_points(self.screen, phys_points_coord, math_points_coord)
@@ -173,7 +192,6 @@ def draw_points(screen, phys_points_coord, math_points_coord):
     phys_points_coord - coordinates of points of physically simulated cord
     math_points_coord - coordinates of points of mathematically simulates cord
     """
-    screen.fill(WHITE)
     for point in phys_points_coord:
         points_color = POINTS_COLORS[0]
         x, y = point
