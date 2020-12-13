@@ -71,8 +71,12 @@ class ProgressBar:
 
     @staticmethod
     def _play_music(path):
-        playsound(path)
-        ProgressBar._play_music(path)
+        try:
+            playsound(path)
+        except UnicodeDecodeError:
+            print('Can\'t read music file')
+        else:
+            ProgressBar._play_music(path)
 
     def __init__(self, on_closed):
         """
