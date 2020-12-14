@@ -19,6 +19,8 @@ RED = (255, 0, 0)
 
 POINTS_COLORS = [BLACK, RED]
 
+FONT_SIZE = 24
+
 
 class AnimationWindow:
     """
@@ -33,8 +35,14 @@ class AnimationWindow:
         self.paused = False
         self.finished = False
         self.screen = None
+        self._font = None
 
     def playback_control(self, event):
+        """
+        Handles pygame.KEYUP events to provide control over playback process
+
+        :param event: a pygame event object
+        """
         key_pause = pygame.K_SPACE
         key_restart = pygame.K_r
         key_quit = pygame.K_ESCAPE
@@ -52,7 +60,7 @@ class AnimationWindow:
 
         assert self.screen
 
-        if event.type == pygame.KEYUP:
+        if event and event.type == pygame.KEYUP:
             key = event.key
             if key == key_pause:
                 self.paused = not self.paused
@@ -74,11 +82,24 @@ class AnimationWindow:
             elif key == key_reset_speed:
                 self.playback_speed = 1
 
+    def _init_font(self):
+        pygame.font.init()
+        try:
+            self._font = pygame.font.SysFont('', FONT_SIZE)
+        except pygame.error as e:
+            print('Failed to load default font')
+            fonts = pygame.font.get_fonts()
+            if fonts:
+                self._font = pygame.font.SysFont(fonts[0], FONT_SIZE)
+
     def start_animation(self):
         """
         Creates pygame window and starts showing animation. **Blocks program execution**
         """
         pygame.init()
+
+        self._init_font()
+
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.screen.fill(WHITE)
 
