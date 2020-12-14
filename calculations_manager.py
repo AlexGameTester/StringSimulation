@@ -89,7 +89,7 @@ class ProgressBar:
         self.phys_percentage = mp.Value(ctypes.c_float, 0.0)
         self.phys_finished = mp.Value(ctypes.c_bool, False)
 
-        self._music_thread = mp.Process(target=ProgressBar._play_music, args=('music.mp3',))
+        self._music_thread = mp.Process(target=ProgressBar._play_music, args=('./music/music_2.mp3',))
 
         self._on_closed = on_closed
 
