@@ -36,7 +36,7 @@ class InputWindow:
         """
         box_quit = messagebox.askquestion("Quit", "Are you sure you want to quit?")
         if box_quit == "yes":
-            self._close()
+            self._abort_execution()
         else:
             pass
     
@@ -170,6 +170,9 @@ class InputWindow:
 
         app = Tk()
         app.title("String Simulation")
+
+        app.protocol('WM_DELETE_WINDOW', self._abort_execution)
+
         self.app = app
         self.app.geometry('400x250')
         self.app.resizable(width=False, height=False)
@@ -224,15 +227,30 @@ class InputWindow:
                          text="Quit")
         button2.grid(row=5, column=1)
 
-        app.mainloop()
+    def do_loop(self):
+        """
+        Starts tkinter mainloop. **Blocks process**
+        """
+        self.app.mainloop()
 
     def _start(self):
         params = self.get_parameters()
 
         if params:
-            self.manager.start_calculation(params, self._close)
+            self.manager.start_parameters = params
+        else:
+            raise ValueError('Failed to create parameters')
+
+        self._close()
 
     def _close(self):
         self.app.destroy()
         self.manager = None
+
+    def _abort_execution(self):
+        """
+        Called when whole program is closed and further calculations won't be executed
+        """
+        self.manager.is_closed = True
+        self._close()
 
