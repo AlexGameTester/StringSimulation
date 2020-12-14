@@ -26,7 +26,14 @@ class Manager:
         if not self.is_closed:
             self.start_calculation()
         else:
-            print('User has closed the program')
+            print('User has closed the program before starting calculation')
+            return
+
+        if not self.is_closed:
+            self.start_output()
+        else:
+            print('User has closed the program before ending calculation')
+            return
 
     def start_calculation(self):
         """
@@ -52,15 +59,15 @@ class Manager:
         self._physical_simulation = phys_simulation
         self._mathematical_simulation = math_simulation
 
-    def on_calculation_ended(self):
-        """
-        Called (by CalculationsManager) when calculation of simulation is ended
-        """
-        assert self._mathematical_simulation
-        assert self._physical_simulation
-        print('Called')
-
-        self.start_output()
+    # def on_calculation_ended(self):
+    #     """
+    #     Called (by CalculationsManager) when calculation of simulation is ended
+    #     """
+    #     assert self._mathematical_simulation
+    #     assert self._physical_simulation
+    #     print('Called')
+    #
+    #     self.start_output()
 
     def start_output(self):
         """

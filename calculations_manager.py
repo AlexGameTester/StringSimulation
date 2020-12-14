@@ -149,7 +149,6 @@ class ProgressBar:
 
 class CalculationsManager:
     """
-    Controls process of simulation of the system
     """
     fps = 400  # TODO: maybe put it somewhere else
 
@@ -162,8 +161,8 @@ class CalculationsManager:
         self._physical_simulator = None
         self._mathematical_simulator = None
 
-        self._phys_thread = None
-        self._math_thread = None
+        self._phys_process = None
+        self._math_process = None
 
         self.canceled = False
 
@@ -174,27 +173,6 @@ class CalculationsManager:
         :return: a SimulationParameters instance with set parameters
         """
 
-        '''
-        def create_init_params():
-            length = 900 / 2
-            max_velocity = 0.4
-            max_y = 900 / 6 * 0.001
-
-            delta_r = length / start_params.number_of_points
-            x = 0
-            y = 0
-            velocity = 0
-            with open("physical_points.txt", "w") as points:
-                for i in range(start_params.number_of_points):
-                    velocity = (max_velocity * (math.sin(2 * math.pi * i / start_params.number_of_points) +
-                                                   math.sin(1 * math.pi * i / start_params.number_of_points)))
-                    if i == start_params.number_of_points-1:
-                        y = 0.
-                    point = str(x) + " " + str(y) + " " + str(velocity) + "\n"
-                    points.write(point)
-
-                    x += delta_r
-        '''
         def read_parameters(path):
             x = y = y_velocity = np.array([])
             with open(path) as points_file:
@@ -209,7 +187,6 @@ class CalculationsManager:
 
         sim_time = int(start_params.simulation_time * self.fps)
 
-        # create_init_params()
         file_picked = start_params.file_picked
         file, ext = os.path.splitext(file_picked)
 
@@ -221,65 +198,72 @@ class CalculationsManager:
         else:
             raise ValueError()
 
-        '''
-        x = np.linspace(0, 300, 2000)
-        y = 25 * np.sin(3 * np.pi * x / 300)
-        y[0] = 0
-        y[len(y) - 1] = 0
-        y_ = x * 0
-        '''
         return SimulationParameters(sim_time, start_params.speed_of_sound,
                                     x, y, y_vel, start_params.precision,
                                     number_of_points=start_params.number_of_points)
+
+    def on_progressbar_closed(self):
+        """
+        Called when progressbar was urgently closed to end program execution properly
+        """
+        self.canceled = True
+        self._abort_calculation()
 
     def start_calculation(self):
         """
         Prepares to start of calculation and starts a calculation cycle
         """
-        '''
-                def make_phys():
-            """
-            Temporary method to make physical simulator
-            :return:
-            """
-            from physical_simulator import create_init_params
-            amount_of_points = sim_params.number_of_points
-            length = 900 // 2
-            max_velocity = 200
-            length_0 = create_init_params(amount_of_points, length, max_velocity)
-            return PhysicalSimulator(sim_params, length_0)
-
-        '''
         sim_params = self._get_simulation_parameters()
+
         self._physical_simulator = PhysicalSimulator(sim_params)
         self._mathematical_simulator = MathematicalSimulator(sim_params)
 
         pb = ProgressBar(self.on_progressbar_closed)
 
-        print('Object before', self._mathematical_simulator)
-        print('Before', len(self._mathematical_simulator._calculated_points))
+        result_queue = self._start_calculation_processes(pb)
 
-        result_queue = mp.Queue()
-
-        self._math_thread = mp.Process(target=self._mathematical_simulator.simulate, args=(pb.math_percentage,
-                                                                                           pb.math_finished,
-                                                                                           result_queue))
-        self._phys_thread = mp.Process(target=self._physical_simulator.simulate, args=(pb.phys_percentage,
-                                                                                       pb.phys_finished,
-                                                                                       result_queue))
-
-        self._math_thread.start()
-        self._phys_thread.start()
-        print('Created processes')
         pb.start()
 
         if self.canceled:
-            return
+            self.manager.is_closed = True
+            self._abort_calculation()
+        else:
+            self._get_results_from_processes(result_queue)
+            self._send_results()
 
+    def _start_calculation_processes(self, progressbar):
+        """
+        Starts processes where mathematical and physical calculations are performed
+
+        :param progressbar: a ProgressBar instance where shared variables are located
+        :return: a queue where results will be sent
+        """
+        result_queue = mp.Queue()
+
+        self._math_process = mp.Process(target=self._mathematical_simulator.simulate, args=(progressbar.math_percentage,
+                                                                                            progressbar.math_finished,
+                                                                                            result_queue))
+        self._phys_process = mp.Process(target=self._physical_simulator.simulate, args=(progressbar.phys_percentage,
+                                                                                        progressbar.phys_finished,
+                                                                                        result_queue))
+
+        self._math_process.start()
+        self._phys_process.start()
+
+        return result_queue
+
+    def _get_results_from_processes(self, result_queue):
+        """
+        Gets results from processes and joins them
+
+        :param result_queue: a queue where results were sent
+        """
         r1, r2 = result_queue.get(), result_queue.get()
 
-        self._math_thread.join()
-        self._phys_thread.join()
+        if self._math_process:  # do I need to join them at the end?
+            self._math_process.join()
+        if self._phys_process:
+            self._phys_process.join()
 
         for type_, obj_ in [r1, r2]:
             if type_ == 'math':
@@ -287,29 +271,23 @@ class CalculationsManager:
             else:
                 self._physical_simulator = obj_
 
-        print('Object after', self._mathematical_simulator)
-        print('After', len(self._mathematical_simulator._calculated_points))
+    def _abort_calculation(self):
+        """
+        Terminates processes where calculations are being performed
+        """
+        if self._math_process:
+            self._math_process.terminate()
+        if self._phys_process:
+            self._phys_process.terminate()
 
-        self._end_calculation()
-
-    def on_progressbar_closed(self):
-        self.canceled = True
-        if self._math_thread:
-            self._math_thread.terminate()
-        if self._phys_thread:
-            self._phys_thread.terminate()
-
-    def _end_calculation(self):
+    def _send_results(self):
+        """
+        Sends results of calculations to manager
+        """
         assert self._physical_simulator
         assert self._mathematical_simulator
 
         phys_sim = self._physical_simulator.get_simulation()
         math_sim = self._mathematical_simulator.get_simulation()
 
-        print('After getting sim', len(self._mathematical_simulator._calculated_points))
-
         self.manager.set_simulations(math_simulation=math_sim, phys_simulation=phys_sim)
-
-        self.manager.on_calculation_ended()
-
-
