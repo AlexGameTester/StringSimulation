@@ -1,11 +1,9 @@
 from typing import Callable
 
-from simulation import Simulation
-from simulator import Simulator
-
 import numpy as np
 
-FPS = 400
+from simulation import Simulation
+from simulator import Simulator
 
 
 class MathSimulation(Simulation):
@@ -28,6 +26,7 @@ class MathematicalSimulator(Simulator):
 
         :param params: a SimulationParameters instance
         """
+        super().__init__(params)
         from calculations_manager import SimulationParameters
         if not isinstance(params, SimulationParameters):
             raise TypeError("Expected <class 'calculations_manager.SimulationParameters'> for params, but got",
@@ -118,7 +117,7 @@ class FourierSolver:
         self.y_pos = y_pos
         self.y_vel = y_vel
         self.x = x
-        # TODO: Check whether it is c or 1/c
+
         self.a = c
         self.length = length
         self.number = number
@@ -192,7 +191,6 @@ class FourierSolver:
 
             x = np.linspace(0, self.length, number_of_points)
 
-            # TODO: check this code somehow
             cos_sum_time_part = np.tile(cos_coefficients * np.cos(k_vals * np.pi * a * time / length),
                                         (number_of_points, 1))
             cos_sum_part = cos_sum_time_part * np.sin(np.pi / length * np.tensordot(x, k_vals, axes=0))

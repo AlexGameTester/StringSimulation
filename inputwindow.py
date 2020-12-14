@@ -3,6 +3,8 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 
+from config import *
+
 
 class StartParameters:
     """Starting parameter which are set by the user.
@@ -48,7 +50,7 @@ class InputWindow:
             return True
     
     def pickfile(self):
-        filename1 = filedialog.askopenfilename(parent=self.app, initialdir="./",
+        filename1 = filedialog.askopenfilename(parent=self.app, initialdir=DATA_PATH,
                                                title="Select a file with input parameters",
                                                filetypes=(("txt files", "*.txt"), ('png files', '*.png')))
         if filename1:
@@ -235,4 +237,3 @@ class InputWindow:
     def _close(self):
         self.app.destroy()
         self.manager = None
-

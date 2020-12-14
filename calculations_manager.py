@@ -1,18 +1,17 @@
-from time import sleep
-
-from playsound import playsound
-
-from inputwindow import StartParameters
-from math_simulator import MathematicalSimulator
-from physical_simulator import PhysicalSimulator
-
-import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
 import multiprocessing as mp
 import os
-import image_reading
 import ctypes
+
+from playsound import playsound
+import numpy as np
+
+from inputwindow import StartParameters
+from math_simulator import MathematicalSimulator
+from physical_simulator import PhysicalSimulator
+import image_reading
+from config import *
 
 
 class SimulationParameters:
@@ -89,7 +88,7 @@ class ProgressBar:
         self.phys_percentage = mp.Value(ctypes.c_float, 0.0)
         self.phys_finished = mp.Value(ctypes.c_bool, False)
 
-        self._music_thread = mp.Process(target=ProgressBar._play_music, args=('./music/music_2.mp3',))
+        self._music_thread = mp.Process(target=ProgressBar._play_music, args=(f'./music/{ACTIVE_MUSIC}',))
 
         self._on_closed = on_closed
 
@@ -151,10 +150,6 @@ class CalculationsManager:
     """
     Controls process of simulation of the system
     """
-    fps = 400  # TODO: maybe put it somewhere else
-
-    text_extensions = ['.txt']
-    image_extensions = ['.png']
 
     def __init__(self, manager, params: StartParameters):
         self.manager = manager
@@ -207,15 +202,15 @@ class CalculationsManager:
 
         start_params = self.start_parameters
 
-        sim_time = int(start_params.simulation_time * self.fps)
+        sim_time = int(start_params.simulation_time * FPS)
 
         # create_init_params()
         file_picked = start_params.file_picked
         file, ext = os.path.splitext(file_picked)
 
-        if ext in self.text_extensions:
+        if ext in TEXT_EXTENSIONS:
             x, y, y_vel = read_parameters(file_picked)
-        elif ext in self.image_extensions:
+        elif ext in IMG_EXTENSIONS:
             x, y = image_reading.read_points(file_picked, length=450, max_y=8)
             y_vel = y * 0
         else:

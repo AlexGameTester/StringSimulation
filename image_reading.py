@@ -1,8 +1,10 @@
 import os
+
 import numpy as np
 from skimage import io
 
-SUPPORTED_EXTENSIONS = ['.png']
+from config import *
+
 WHITE_GRAYSCALE = 1
 
 
@@ -41,7 +43,7 @@ def read_points(path: str, length=400, max_y=1):
         raise ValueError("length must be positive")
 
     file, extension = os.path.splitext(path)
-    if extension not in SUPPORTED_EXTENSIONS:
+    if extension not in IMG_EXTENSIONS:
         raise ValueError("File extension is not supported")
 
     if not os.path.exists(path):

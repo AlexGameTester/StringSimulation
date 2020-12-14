@@ -1,4 +1,3 @@
-from typing import Callable
 import math
 import time
 
@@ -7,15 +6,9 @@ import numpy as np
 
 from simulation import Simulation
 from simulator import Simulator
+from config import *
 
-SCREEN_WIDTH = 900
-SCREEN_HEIGHT = 900
 POINT_RADIUS = 5
-FPS = 400
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-
 ALPHA = 0.01
 
 
@@ -33,7 +26,7 @@ class PhysicalSimulation(Simulation):
                 Returns a numpy array of y-coordinates of points **in consecutive order**
                  that represents a string at specific moment of time
 
-                :param time_moment: a list of points represented as tuples TODO: choose another type
+                :param time_moment: a list of points represented as tuples
         """
         points_coord = []
         for point in self.points:
@@ -116,9 +109,6 @@ class PhysicalSimulator(Simulator):
         self.delta_time = 1 / (100 + params.accuracy)
         self.counts_per_frame = int(1 / self.delta_time)
         self.calc_count = params.simulation_time * self.counts_per_frame
-
-        ratio = int(len(params.initial_positions_x) / params.number_of_points)
-        point_number = 0
 
         x_linted = np.linspace(0, params.string_length, params.number_of_points)
         y_linted = np.interp(x_linted, params.initial_positions_x, params.initial_positions_y)

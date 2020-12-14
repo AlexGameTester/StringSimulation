@@ -4,18 +4,12 @@ import pygame
 import numpy as np
 
 import calculations_manager
+from config import *
 
-SCREEN_WIDTH = 900
-SCREEN_HEIGHT = 900
 CALC_NUMBER = 60000
-FPS = 400
 
 POINT_RADIUS = 5
 DRAWING_STEP = 1
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
 
 POINTS_COLORS = [BLACK, RED]
 
