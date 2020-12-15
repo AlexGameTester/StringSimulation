@@ -104,6 +104,7 @@ class AnimationWindow:
 
         clock = pygame.time.Clock()
 
+        pygame.display.set_caption('StringSimulation')
         try:
             while not self.finished:
                 clock.tick(FPS)
@@ -117,8 +118,6 @@ class AnimationWindow:
                 if self.current_frame < self.simulation_time and not self.paused:
                     self.draw_frame()
                     self.current_frame = min(self.current_frame + self.playback_speed, self.simulation_time - 1)
-
-                pygame.display.set_caption(str(clock.get_fps()))
 
             pygame.quit()
         finally:
