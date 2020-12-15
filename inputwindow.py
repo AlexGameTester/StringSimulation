@@ -41,14 +41,14 @@ class InputWindow:
             self._abort_execution()
         else:
             pass
-    
+
     def onValidate(self, i):
         if getdouble(i) > 7:
             self.app.bell()
             return False
         else:
             return True
-    
+
     def pickfile(self):
         filename1 = filedialog.askopenfilename(parent=self.app, initialdir=DATA_PATH,
                                                title="Select a file with input parameters",
@@ -77,7 +77,7 @@ class InputWindow:
             elif s[0] in ('-', '+'):
                 return s[1:].isdigit()
             return s.isdigit()
-        
+
         def check_whether_real(s):
             """
             Checks whether given string represents a real number, if string = "" then returns 'Blanked'
@@ -116,8 +116,8 @@ class InputWindow:
                                  "Please check whether number of points and precision parameters are positive integers")
         elif any(item == False for item in real_check_list):
 
-            messagebox.showerror("Non-real value validation error", 
-                                "Please check whether 'simulation time' and 'sound speed' are positive reals")
+            messagebox.showerror("Non-real value validation error",
+                                 "Please check whether 'simulation time' and 'sound speed' are positive reals")
         elif any([getdouble(item) < 0 for item in (list_int + list_real)]):
 
             messagebox.showerror("Negative value validation error", "Please check whether all values are positive")
@@ -125,40 +125,40 @@ class InputWindow:
 
             messagebox.showerror("Non-integer value validation error",
                                  "Please check whether number of points and precision parameters are integers")
-        elif getint(self.points_entry.get()) > 1000: ##number of points validation <=3
+        elif getint(self.points_entry.get()) > 1000:  ##number of points validation <=3
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the number of points in a chain is less or equal than 1000")
-        elif getint(self.precision_entry.get()) > 1000: #precision validation <=1000
+        elif getint(self.precision_entry.get()) > 1000:  # precision validation <=1000
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the precision parameter is less or equal than 1000")
-        elif getint(self.points_entry.get()) < 3: #number of points validation >= 3
-            
-            messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the number of points in a chain is greater or equal than 3")
-        elif getint(self.precision_entry.get()) < 10: #precision must be >= 10 validation
+        elif getint(self.points_entry.get()) < 3:  # number of points validation >= 3
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the precision parameter is greater or equal than 10")                         
-        elif getdouble(text1) > 343: #speed of sound must be <= 343 validation
+                                 "Please check whether the number of points in a chain is greater or equal than 3")
+        elif getint(self.precision_entry.get()) < 10:  # precision must be >= 10 validation
+
+            messagebox.showerror("Parameter is out of range",
+                                 "Please check whether the precision parameter is greater or equal than 10")
+        elif getdouble(text1) > 343:  # speed of sound must be <= 343 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text1) <= 0: #speed of sound must be > 0 validation
+        elif getdouble(text1) <= 0:  # speed of sound must be > 0 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is greater or equal than 5")
-        elif getdouble(text2) > 100: #simulation time must be <= 100 validation
+        elif getdouble(text2) > 100:  # simulation time must be <= 100 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the simulation time within the required range")
-        elif getdouble(text2) < 5: #simulation time must be >= 5 validation
+        elif getdouble(text2) < 5:  # simulation time must be >= 5 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the simulation time is greater or equal than 5")
-        elif self.filename == None:
-            
+        elif self.filename is None:
+
             messagebox.showerror("No file picked",
                                  "Please check whether you have picked file with input parameters")
         else:
@@ -179,13 +179,12 @@ class InputWindow:
         self.app.geometry('400x250')
         self.app.resizable(width=False, height=False)
         self.filename = None
-        
+
         validate_command = (self.app.register(self.onValidate), '%i')
 
         center_frame = Frame(self.app)
         center_frame.pack(side=TOP)
 
-        method_options = ["Fourier method", "Method 2"]
         self.pick = StringVar()
 
         self.label1 = Label(center_frame, text="Speed of sound in material")
@@ -212,16 +211,16 @@ class InputWindow:
         self.precision_entry.insert(0, "10")
         self.precision_entry.grid(row=3, column=1, pady=5, padx=5)
 
-        self.label5 = Label(center_frame, text="Solution method")
+        self.label5 = Label(center_frame, text="Simulation method")
         self.label5.grid(row=4, column=0, pady=5, padx=5)
-        self.menu1 = ttk.Combobox(center_frame, value=method_options, textvariable=self.pick, state="readonly")
+        self.menu1 = ttk.Combobox(center_frame, value=SIMULATION_METHODS, textvariable=self.pick, state="readonly")
         self.menu1.current(0)
         self.menu1.grid(row=4, column=1, pady=5, padx=5)
 
         button1 = Button(center_frame, command=self._start, width=10,
                          height=2, font=18, text="Start")
         button1.grid(row=5)
-        
+
         button_pick_file = Button(center_frame, width=10, height=1, command=self.pickfile, text="File menu")
         button_pick_file.grid(row=6, column=1)
 
@@ -255,4 +254,3 @@ class InputWindow:
         """
         self.manager.is_closed = True
         self._close()
-

@@ -24,6 +24,7 @@ class SimulationParameters:
                  initial_positions_x: np.ndarray,
                  initial_positions_y: np.ndarray,
                  initial_velocities_y: np.ndarray,
+                 simulation_method: str,
                  accuracy=1,
                  number_of_points=100,
                  **kwargs):
@@ -44,6 +45,10 @@ class SimulationParameters:
         """Numpy array with points initial y-coordinates"""
         self.initial_velocities_y = initial_velocities_y
         """Numpy array with points initial y-velocities"""
+
+        assert simulation_method
+        self.simulation_method = simulation_method
+        """Method to use for physical simulation"""
 
         assert accuracy > 0
         self.accuracy = accuracy
@@ -194,7 +199,7 @@ class CalculationsManager:
             raise ValueError()
 
         return SimulationParameters(sim_time, start_params.speed_of_sound,
-                                    x, y, y_vel, start_params.precision,
+                                    x, y, y_vel, start_params.method, accuracy=start_params.precision,
                                     number_of_points=start_params.number_of_points)
 
     def on_progressbar_closed(self):

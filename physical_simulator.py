@@ -1,3 +1,4 @@
+from typing import Callable
 import math
 import time
 
@@ -9,6 +10,7 @@ from simulator import Simulator
 from config import *
 
 POINT_RADIUS = 5
+
 ALPHA = 0.01
 
 
@@ -53,6 +55,22 @@ class Point:
         self.velocity = y_velocity
         self.number = number
         self.coordinates = [(self.x, self.y)]
+
+    def interact_const_force(self, left_point, right_point, T, dt):
+        y0 = self.y
+        x0 = self.x
+        v0 = self.velocity
+        y1 = left_point.y
+        x1 = left_point.x
+        v1 = left_point.velocity
+        y2 = right_point.y
+        x2 = right_point.x
+        v2 = right_point.velocity
+
+        l1 = math.sqrt((x0 - x1)**2 + (y0 - y1)**2)
+        l2 = math.sqrt((x0 - x2)**2 + (y0 - y2)**2)
+        acceleration = T * ((y1 - y0) / l1 + (y2 - y0) / l2)
+        self.velocity -= acceleration * dt
 
     def interact(self, left_point_x, left_point_y,
                  right_point_x, right_point_y,
@@ -104,6 +122,10 @@ class PhysicalSimulator(Simulator):
         self.points = []
         self.my_time = 0
 
+        self.length = params.string_length
+        self.number_of_points = params.number_of_points
+        self.method = params.simulation_method
+
         self.speed_of_sound = params.speed_of_sound
         self.amount_of_points = params.number_of_points
         self.delta_time = 1 / (100 + params.accuracy)
@@ -141,17 +163,28 @@ class PhysicalSimulator(Simulator):
                        (self.amount_of_points - 1) / (length ** 2 * (1 - ALPHA)))
         length_0 = ALPHA * length / (self.amount_of_points - 1)
 
+        tension_acceleration = self.speed_of_sound**2 / self.length * self.number_of_points
+
+        if self.method not in SIMULATION_METHODS:
+            raise ValueError("Unknown method %s" % self.method)
+
+        import time
+
+        # start = time.time_ns()
         i = 0
         while i < self.calc_count:
             for point in self.points:
                 if point.number != 0 and point.number != len(self.points) - 1:
-                    left_point_number = self.points[point.number - 1]
-                    right_point_number = self.points[point.number + 1]
-                    point.interact(left_point_number.x,
-                                   left_point_number.y,
-                                   right_point_number.x,
-                                   right_point_number.y,
-                                   coefficient, length_0, self.delta_time)
+                    left_point = self.points[point.number - 1]
+                    right_point = self.points[point.number + 1]
+                    if self.method == CONSTANT_FORCE:
+                        point.interact_const_force(left_point,
+                                                   right_point,
+                                                   tension_acceleration, self.delta_time)
+                    elif self.method == SPRINGS:
+                        point.interact(left_point.x, left_point.y,
+                                       right_point.x, right_point.y,
+                                       coefficient, length_0, self.delta_time)
                     point.move(self.delta_time)
                 if i % self.counts_per_frame == 0:
                     point.make_a_record()
@@ -159,6 +192,9 @@ class PhysicalSimulator(Simulator):
             if i % 500 == 0:
                 percentage.value = i / self.calc_count
             i += 1
+
+        # end = time.time_ns()
+        # print('Spent time:', (end - start) * 1e-9)
 
         percentage.value = 1
 
