@@ -13,6 +13,8 @@ DRAWING_STEP = 1
 
 POINTS_COLORS = [BLACK, RED]
 
+FONT_SIZE = 24
+
 
 class AnimationWindow:
     """
@@ -22,45 +24,145 @@ class AnimationWindow:
         self._math_simulation = math_simulation
         self._phys_simulation = phys_simulation
 
-        self.animation_time = 0
+        assert self._math_simulation == math_simulation
+        assert self._phys_simulation == phys_simulation
+        assert self._math_simulation.simulation_time == self._phys_simulation.simulation_time
+        self.simulation_time = self._math_simulation.simulation_time
+        """Number of frames in animation"""
+
+        self.current_frame = 0
+        self.playback_speed = 1.0
+        self.paused = False
+        self.finished = False
+        self.screen = None
+        self._font = None
+
+    def playback_control(self, event):
+        """
+        Handles pygame.KEYUP events to provide control over playback process
+
+        :param event: a pygame event object
+        """
+        key_pause = pygame.K_SPACE
+        key_restart = pygame.K_r
+        key_quit = pygame.K_ESCAPE
+
+        key_backwards = pygame.K_LEFT
+        key_forward = pygame.K_RIGHT
+        step = int(0.75 * FPS)
+
+        key_speedup = pygame.K_UP
+        key_speeddown = pygame.K_DOWN
+        key_reset_speed = pygame.K_s
+        speed_step = 0.2
+        min_speed = speed_step
+        max_speed = 5
+
+        assert self.screen
+
+        if event and event.type == pygame.KEYUP:
+            key = event.key
+            if key == key_pause:
+                self.paused = not self.paused
+            elif key == key_quit:
+                self.finished = True
+            elif key == key_restart:
+                self.current_frame = 0
+            elif key == key_backwards:
+                self.current_frame = max(0, self.current_frame - step)
+            elif key == key_forward:
+                self.current_frame = min(self.simulation_time - 1, self.current_frame + step)
+            elif key == key_speedup:
+                self.playback_speed = min(max(min_speed, self.playback_speed + speed_step), max_speed)
+            elif key == key_speeddown:
+                self.playback_speed = min(max(min_speed, self.playback_speed - speed_step), max_speed)
+            elif key == key_reset_speed:
+                self.playback_speed = 1
+
+            self.draw_frame()
+
+    def _init_font(self):
+        pygame.font.init()
+        try:
+            self._font = pygame.font.SysFont('', FONT_SIZE)
+        except pygame.error as e:
+            print('Failed to load default font')
+            fonts = pygame.font.get_fonts()
+            if fonts:
+                self._font = pygame.font.SysFont(fonts[0], FONT_SIZE)
 
     def start_animation(self):
         """
         Creates pygame window and starts showing animation. **Blocks program execution**
         """
         pygame.init()
-        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        screen.fill(WHITE)
+
+        self._init_font()
+
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen.fill(WHITE)
 
         clock = pygame.time.Clock()
-        finished = False
 
-        while not finished:
-            clock.tick(FPS)
+        try:
+            while not self.finished:
+                clock.tick(FPS)
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    finished = True
-                elif event.type == pygame.KEYDOWN:
-                    key = event.key
-                    if key == pygame.K_q or key == pygame.K_ESCAPE:
-                        finished = True
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.finished = True
+                    else:
+                        self.playback_control(event)
 
-            assert self._math_simulation.simulation_time == self._phys_simulation.simulation_time, 'Math: {}, Phys: {}'.format(self._math_simulation.simulation_time, self._phys_simulation.simulation_time)
+                if self.current_frame < self.simulation_time and not self.paused:
+                    self.draw_frame()
+                    self.current_frame = min(self.current_frame + self.playback_speed, self.simulation_time - 1)
 
-            if self.animation_time < self._math_simulation.simulation_time:
-                phys_points_coord = self._phys_simulation.get_points_at(self.animation_time)
-                math_points_coord = self._math_simulation.get_points_at(self.animation_time)
-                draw_points(screen, phys_points_coord, math_points_coord)
+                pygame.display.set_caption(str(clock.get_fps()))
 
-                self.animation_time += DRAWING_STEP
-            else:
-                time.sleep(2)
-                finished = True
+            pygame.quit()
+        finally:
+            pygame.quit()
 
-            pygame.display.set_caption(str(clock.get_fps()))
+    def _draw_playback_speed(self):
+        if self._font:
+            playback_speed = self._font.render('{:.2f}x'.format(self.playback_speed), True, BLACK)
+            self.screen.blit(playback_speed, (0.15 * SCREEN_WIDTH, 0.06 * SCREEN_HEIGHT))
 
-            pygame.display.update()
+    def _draw_frame_number(self):
+        if self._font:
+            frame_number = self._font.render('{:.2f}/{}'.format(self.current_frame + 1, self.simulation_time)
+                                             , True, BLACK)
+            self.screen.blit(frame_number, (0.485 * SCREEN_WIDTH, 0.03 * SCREEN_HEIGHT))
+
+    def _draw_playback_progress(self):
+        # progress bar border
+        start_y = int(0.05 * SCREEN_HEIGHT)
+        start_x = int(0.2 * SCREEN_WIDTH)
+        length_y = int(0.05 * SCREEN_HEIGHT)
+        length_x = int(0.6 * SCREEN_WIDTH)
+        pygame.draw.rect(self.screen, BLACK, [start_x, start_y, length_x, length_y])
+        # progress bar
+        pb_start_y = int(0.06 * SCREEN_HEIGHT)
+        pb_start_x = int(0.21 * SCREEN_WIDTH)
+        pb_length_y = int(0.03 * SCREEN_HEIGHT)
+        progress = self.current_frame / self.simulation_time
+        pb_length_x = int(0.58 * SCREEN_WIDTH * progress)
+        pygame.draw.rect(self.screen, RED, [pb_start_x, pb_start_y, pb_length_x, pb_length_y])
+
+    def draw_frame(self):
+        frame_number = int(self.current_frame)
+        self.screen.fill(WHITE)
+
+        phys_points_coord = self._phys_simulation.get_points_at(frame_number)
+        math_points_coord = self._math_simulation.get_points_at(frame_number)
+        draw_points(self.screen, phys_points_coord, math_points_coord)
+
+        self._draw_playback_progress()
+        self._draw_playback_speed()
+        self._draw_frame_number()
+
+        pygame.display.update()
 
 
 def main():
@@ -120,10 +222,12 @@ def draw_points(screen, phys_points_coord, math_points_coord):
     phys_points_coord - coordinates of points of physically simulated cord
     math_points_coord - coordinates of points of mathematically simulates cord
     """
-    screen.fill(WHITE)
     for point in phys_points_coord:
         points_color = POINTS_COLORS[0]
         x, y = point
+        if x < 0 or x > SCREEN_WIDTH or y < 0 or y > SCREEN_HEIGHT:
+            continue
+
         pygame.draw.circle(screen,
                            points_color,
                            (int(x), int(10 * (y - SCREEN_HEIGHT//2) + SCREEN_HEIGHT // 2)),
@@ -132,9 +236,12 @@ def draw_points(screen, phys_points_coord, math_points_coord):
     for point in math_points_coord:
         points_color = POINTS_COLORS[1]
         x, y = point
+        if x < -SCREEN_WIDTH or x > SCREEN_WIDTH or y < -SCREEN_HEIGHT or y > SCREEN_HEIGHT:
+            continue
+
         pygame.draw.circle(screen,
                            points_color,
-                           (int(x + SCREEN_WIDTH // 4), int(-10 * y) + SCREEN_HEIGHT // 2),
+                           (int(x + SCREEN_WIDTH // 4), int(10 * y) + SCREEN_HEIGHT // 2),
                            POINT_RADIUS)
 
 
