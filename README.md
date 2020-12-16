@@ -4,6 +4,10 @@
 * Simulates string oscillations using two main methods:
 
 ### Method #1: Physical simulation.
+1. Springs.
+Simulates a string as a set of point masses connected with springs governed by [Hooke's Law](https://en.wikipedia.org/wiki/Hooke%27s_law).
+2. Constant force.
+Simulates a spring as a set of point masses that apply force T on neighbours. The force has constant magnitude and it's pointing on the neighbouring point.
 
 ### Method #2: Solving wave equation.
 Wave equation, more about wave equation:
@@ -18,6 +22,8 @@ more on Fourier method:
 + [Fourier Method](https://www.roe.ac.uk/japwww/teaching/fourier/fourier_lectures_part5.pdf)
 
 + [Fourier Transform](https://en.wikipedia.org/wiki/Fourier_transform)
+
++ [Fourier Method for Wave Equation(RUS)](http://window.edu.ru/resource/137/47137/files/sssu081.pdf)
 
 
 
