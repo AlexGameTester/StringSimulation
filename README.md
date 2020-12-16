@@ -87,6 +87,31 @@ Details - [Physical Simulation](#description).
 
 **Default value** - "Springs"
 
+#### Buttons ####
+
+1. "**File Menu**" - after clicking you should choose a non-empty file with initial parameters of points of a string. Initial parameters include:
+vertical components of velocities and y coordinates for each point in a string.
+*file format* - **.txt**
+
+2. "**Start**" - after you have filled all input fields correctly and choose file with initial parameters you may press start button. 
+Pressing it will execute main modules of the program. In particular, you will see [Progress Bar](#progress-bar).
+
+
+### **Progress Bar**:
+
+
+If you have executed program with no exceptions you will see *progress bar*, 
+
+![Image of PgrBr](https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/Безымянный.png)
+
+The bar allows you to track relative completion time of simulation processing. 
+When processing of simulation will be finished, window will display 100%.
+
+### **Animation Window**:
+
+
+
+
 ## Module Description.
 
 
