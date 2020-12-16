@@ -18,6 +18,15 @@ class DataCreate:
         self.get_filename()
         while not self.txt_generated:
             print("Enter function for y(x) (for ex sin(x))\n----> ")
+            function = input()
+            try:
+                self.create_init_params(function)
+                self.txt_generated = True
+            except Exception:
+                self.txt_generated = False
+                self.talk()
+                self.generate_txt_file()
+
             self.talk()
             self.txt_generated = True
 
@@ -26,6 +35,10 @@ class DataCreate:
         self.file_name = input()
         self.file_name += '.txt'
         print(f"OK. The future file name is {self.file_name}\n")
+
+    def create_init_params(self, function):
+        eval(function)
+        print(function)
 
     def talk(self):
         if self.txt_generated and self.is_active:
