@@ -1,6 +1,8 @@
 from math import *
 import os
 
+import numpy as np
+
 import config
 
 
@@ -25,19 +27,19 @@ class DataCreate:
         self.get_filename()
         self.get_amount_of_points()
         while not self.txt_generated:
-            print("Enter function for v_y(x)\n"
+            print("Enter function for y(x)\n"
                   "For example sin(2*pi*i/self.amount_of_points)\n----> ")
             function = input()
             try:
                 self.create_init_params(function)
                 self.txt_generated = True
-            except Exception:
+            except Exception as err:
+                print(err)
                 self.txt_generated = False
                 self.talk()
                 self.generate_txt_file()
 
             self.talk()
-            self.txt_generated = True
 
     def get_filename(self):
         print("\nEnter a name for the new file (without .txt): ")
@@ -53,15 +55,25 @@ class DataCreate:
     def create_init_params(self, function):
         os.chdir('../data')
         delta_r = config.SCREEN_WIDTH / (2*self.amount_of_points)
-        x = 0
-        y = 0
-        max_velocity = 0.4
-        with open(self.file_name, "w") as points:
-            for i in range(self.amount_of_points):
-                velocity = max_velocity * eval(function)
-                point = str(x) + " " + str(y) + " " + str(velocity) + "\n"
-                points.write(point)
+        max_y_coordinate = config.SCREEN_HEIGHT / 40
+        y_coordinates = []
 
+        x = point_number = 0
+        while point_number < self.amount_of_points:
+            y_coordinates.append(eval(function))
+            x += delta_r
+            point_number += 1
+
+        y_abs = [abs(y) for y in y_coordinates]
+        max_y = max(y_abs)
+        for num, y in enumerate(y_coordinates):
+            y_coordinates[num] = y * max_y_coordinate / max_y
+
+        x = velocity = 0
+        with open(self.file_name, "w") as points:
+            for y in y_coordinates:
+                record = str(x) + " " + str(y) + " " + str(velocity) + "\n"
+                points.write(record)
                 x += delta_r
 
     def talk(self):
