@@ -193,7 +193,7 @@ class InputWindow:
         self.label1 = Label(center_frame, text="Speed of sound in material")
         self.label1.grid(row=0, column=0, pady=5, padx=5)
         self.sound_speed_entry = Entry(center_frame, validatecommand=validate_command, validate="key")
-        self.sound_speed_entry.insert(0, "5")
+        self.sound_speed_entry.insert(0, "1")
         self.sound_speed_entry.grid(row=0, column=1, pady=5, padx=5)
 
         self.label2 = Label(center_frame, text="Simulation Time")
