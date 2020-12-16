@@ -32,7 +32,12 @@ more on Fourier method:
 
 ### **Input Window**:
 
-there are five inputs in this window:
+
+![Image of InpWdw](https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/InputWdw.png)
+
+
+
+### there are five inputs in this window:
 
 1. **Speed of Sound in material**: Speed with which sound wave propagates in the string material. 
 "c" coefficient in the wave equation stands for this parameter.
@@ -54,7 +59,7 @@ measured in seconds.
 3. **Number of points in a chain**: Number of material points in the chain. For more details see - [Physical Simulation](#description)
 
 **Validation** - must be an integer in range  *3 <= param <= 1000* .
-no specified units.
+no specified units. 
 
 **Default Value** - 20
 
@@ -68,14 +73,17 @@ no specified units.
 
 
 5. **Simulation method**: Determines how physical string will be modelled. List with two options:
-1. Springs.
-2. Constant Force.
+  
+    1. Springs.
+    2. Constant Force.
 
 Details - [Physical Simulation](#description).
 
 **Default value** - "Springs"
 
 ## Module Description.
+
+
 
 * **animation_window**:
 * **calculations_manager**:
@@ -84,8 +92,12 @@ Details - [Physical Simulation](#description).
 
 * **inputwindow**: user interface in which initial conditions(elastic characteristics of a string e.g.) can be inputted. For usage see - [Usage](#usage) inputwindow.
 
-* **main**:
-* **manager**:
+* **main**: main module.
+
+* **manager**: regulates work of Output_manager, Calculation_manager, Input_window. and their interaction via passing necessary data(starting parameters, solutions...).
+
+*some functions*:starts calculation processes, starts string animations, shows input window.
+
 * **math_simulator**:
 * **output_manager**:
 * **physical_simulator**:
