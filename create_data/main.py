@@ -6,7 +6,7 @@ import config
 MAX_POINTS = 10000
 
 
-class DataCreate:
+class DataCreator:
     def __init__(self):
         self.greeting_text = []
         with open('greeting.txt', 'r') as greeting_file:
@@ -68,7 +68,7 @@ class DataCreate:
     def create_init_params(self, function):
         os.chdir('../data')
         delta_r = config.SCREEN_WIDTH / (2*self.amount_of_points)
-        max_y_coordinate = config.SCREEN_HEIGHT / 40
+        max_y_coordinate = 8
         y_coordinates = []
 
         x = point_number = 0
@@ -100,7 +100,7 @@ class DataCreate:
 
 
 def main():
-    data_create = DataCreate()
+    data_create = DataCreator()
     data_create.greeting()
     data_create.generate_txt_file()
 
