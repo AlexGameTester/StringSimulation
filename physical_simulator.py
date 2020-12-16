@@ -232,9 +232,9 @@ class PhysicalSimulator(Simulator):
 
 def main():
     import calculations_manager
-    import inputwindow
+    import input_window
 
-    start_params = inputwindow.StartParameters(1, 100, 40, 1, 1)
+    start_params = input_window.StartParameters(1, 100, 40, 1, 1)
     calc_manager = calculations_manager.CalculationsManager(10, start_params)
 
     sim_params = calc_manager._get_simulation_parameters()

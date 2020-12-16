@@ -7,7 +7,7 @@ import ctypes
 from playsound import playsound
 import numpy as np
 
-from inputwindow import StartParameters
+from input_window import StartParameters
 from math_simulator import MathematicalSimulator
 from physical_simulator import PhysicalSimulator
 import image_reading

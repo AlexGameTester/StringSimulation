@@ -165,7 +165,7 @@ class AnimationWindow:
 
 
 def main():
-    import inputwindow
+    import input_window
     import math_simulator
     import physical_simulator
 
@@ -174,7 +174,7 @@ def main():
     math_sim.simulate()
     math_simulation = math_sim.get_simulation()
 
-    start_params = inputwindow.StartParameters(1, 100, 40, 1, 1)
+    start_params = input_window.StartParameters(1, 100, 40, 1, 1)
     calc_manager = calculations_manager.CalculationsManager(10, start_params)
     sim_params = calc_manager._get_simulation_parameters()
     sim_params.speed_of_sound = 150

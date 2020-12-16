@@ -1,5 +1,5 @@
 from calculations_manager import CalculationsManager
-from inputwindow import StartParameters, InputWindow
+from input_window import StartParameters, InputWindow
 from output_manager import OutputManager
 from simulation import Simulation
 
