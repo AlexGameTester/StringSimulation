@@ -95,20 +95,20 @@ class InputWindow:
         int_check_list = [check_int(item) for item in list_int]
         real_check_list = [check_whether_real(item) for item in list_real]
 
-        if not all([text1, text2, text3, text4]):
+        if not all([text1, text2, text3, text4]):#checks whether fields are blanked and if so pastes default values - 5, 5, 20, 10
             box1 = messagebox.askquestion("Validation Error: Blank fields",
                                           "Some of the value inputs were left empty, Do you want to use standard "
                                           "values for those which are missing?")
 
             if box1 == "yes":
                 if len(text1) == 0:
-                    self.sound_speed_entry.insert(0, 1)
+                    self.sound_speed_entry.insert(0, 5)
                 if len(text2) == 0:
-                    self.simulation_time_entry.insert(0, 1)
+                    self.simulation_time_entry.insert(0, 5)
                 if len(text3) == 0:
-                    self.points_entry.insert(0, 1)
+                    self.points_entry.insert(0, 20)
                 if len(text4) == 0:
-                    self.precision_entry.insert(0, 1)
+                    self.precision_entry.insert(0, 10)
 
         elif not all([string.isnumeric() for string in list_int]):
 
@@ -145,7 +145,7 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text1) <= 0:  # speed of sound must be > 0 validation
+        elif getdouble(text1) < 5:  # speed of sound must be >= 5 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is greater or equal than 5")
