@@ -3,6 +3,8 @@ import os
 
 import config
 
+MAX_POINTS = 10000
+
 
 class DataCreate:
     def __init__(self):
@@ -23,7 +25,11 @@ class DataCreate:
 
     def generate_txt_file(self):
         self.get_filename()
-        self.get_amount_of_points()
+        try:
+            self.get_amount_of_points()
+        except Exception as err:
+            print("!!ERROR!! --- ", err)
+
         while not self.txt_generated:
             print("Enter function for y(x)\n"
                   "For example sin(2*pi*x/450)\n----> ")
@@ -48,6 +54,10 @@ class DataCreate:
     def get_amount_of_points(self):
         print("Enter the number of points in the file: ")
         self.amount_of_points = int(input())
+        if self.amount_of_points <= 0:
+            raise ValueError('Number of points must be positive')
+        elif self.amount_of_points > MAX_POINTS:
+            raise ValueError(f'Number of points must be at most {MAX_POINTS}')
         print(f"Ok. The cord is modeled from {self.amount_of_points} points\n")
 
     def create_init_params(self, function):
