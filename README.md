@@ -105,10 +105,32 @@ If you have executed program with no exceptions you will see *progress bar*,
 ![Image of PgrBr](https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/Безымянный.png)
 
 The bar allows you to track relative completion time of simulation processing. 
-When processing of simulation will be finished, window will display 100%.
+When processing of simulation will be finished, window will display 100%. And you will see an [animation window](#animation-window).
 
 ### **Animation Window**:
+When the processing was done, program will launch animation:
 
+<p><img width=50% height=50% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/Window1.png"></p>
+
+
+
+Besides animation itself - red points which represented the string, there is a playback bar:
+
+<p><img width=50% height=50% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/Window3.png"></p>
+
+With two parameters:
+
+1.[Simulation Time](#usage)
+
+2.[Playback Speed](#usage)
+
+Which supports player functionality,
+
+For example: pressing **left** or **right button** 
+<img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/keyboard_key_right.png"> 
+you may move forward or backward in animation playback:
+
+![Gif PlForw](https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/ezgif.com-video-to-gif.gif)
 
 
 
