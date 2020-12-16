@@ -1,8 +1,6 @@
 from math import *
 import os
 
-import numpy as np
-
 import config
 
 
@@ -28,13 +26,13 @@ class DataCreate:
         self.get_amount_of_points()
         while not self.txt_generated:
             print("Enter function for y(x)\n"
-                  "For example sin(2*pi*i/self.amount_of_points)\n----> ")
+                  "For example sin(2*pi*x/450)\n----> ")
             function = input()
             try:
                 self.create_init_params(function)
                 self.txt_generated = True
             except Exception as err:
-                print(err)
+                print("!!ERROR!! --- ", err)
                 self.txt_generated = False
                 self.talk()
                 self.generate_txt_file()
