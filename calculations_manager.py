@@ -190,13 +190,19 @@ class CalculationsManager:
         file_picked = start_params.file_picked
         file, ext = os.path.splitext(file_picked)
 
-        if ext in TEXT_EXTENSIONS:
-            x, y, y_vel = read_parameters(file_picked)
-        elif ext in IMG_EXTENSIONS:
-            x, y = image_reading.read_points(file_picked, length=450, max_y=8)
-            y_vel = y * 0
-        else:
-            raise ValueError()
+        try:
+            if ext in TEXT_EXTENSIONS:
+                x, y, y_vel = read_parameters(file_picked)
+            elif ext in IMG_EXTENSIONS:
+                x, y = image_reading.read_points(file_picked, length=450, max_y=8)
+                y_vel = y * 0
+            else:
+                raise ValueError('Incorrect file extension')
+
+        except Exception as e:
+            print('An error occurred while reading parameters:')
+            print(e)
+            return None
 
         return SimulationParameters(sim_time, start_params.speed_of_sound,
                                     x, y, y_vel, start_params.method, accuracy=start_params.precision,
@@ -214,6 +220,11 @@ class CalculationsManager:
         Prepares to start of calculation and starts a calculation cycle
         """
         sim_params = self._get_simulation_parameters()
+
+        if sim_params is None:
+            self.manager.is_closed = True
+            self.manager.close_message = 'An error occurred while reading data from file'
+            return
 
         self._physical_simulator = PhysicalSimulator(sim_params)
         self._mathematical_simulator = MathematicalSimulator(sim_params)

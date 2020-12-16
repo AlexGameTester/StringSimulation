@@ -134,6 +134,14 @@ class AnimationWindow:
                                              , True, BLACK)
             self.screen.blit(frame_number, (0.485 * SCREEN_WIDTH, 0.03 * SCREEN_HEIGHT))
 
+    def _draw_label(self):
+        """Draws labels for strings"""
+        if self._font:
+            phys = self._font.render('Physics', True, BLACK)
+            math = self._font.render('Mathematics', True, RED)
+            self.screen.blit(phys, (0.0095 * SCREEN_WIDTH, 0.94 * SCREEN_HEIGHT))
+            self.screen.blit(math, (0.0095 * SCREEN_WIDTH, 0.97 * SCREEN_HEIGHT))
+
     def _draw_playback_progress(self):
         # progress bar border
         start_y = int(0.05 * SCREEN_HEIGHT)
@@ -160,6 +168,7 @@ class AnimationWindow:
         self._draw_playback_progress()
         self._draw_playback_speed()
         self._draw_frame_number()
+        self._draw_label()
 
         pygame.display.update()
 

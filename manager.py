@@ -16,6 +16,8 @@ class Manager:
         self.start_parameters = None
         self.is_closed = False
 
+        self.close_message = 'User has closed the program before starting calculation'
+
     def start(self):
         """
         Starts execution of the program
@@ -23,16 +25,18 @@ class Manager:
         self._input_window = InputWindow(self)
         self._input_window.start_loop()
 
+        self.close_message = 'User has closed the program before ending calculation'
+
         if not self.is_closed:
             self.start_calculation()
         else:
-            print('User has closed the program before starting calculation')
+            print(self.close_message)
             return
 
         if not self.is_closed:
             self.start_output()
         else:
-            print('User has closed the program before ending calculation')
+            print(self.close_message)
 
     def start_calculation(self):
         """
