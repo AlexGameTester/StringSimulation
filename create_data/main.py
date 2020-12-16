@@ -1,4 +1,5 @@
 from math import *
+import os
 
 import config
 
@@ -24,7 +25,8 @@ class DataCreate:
         self.get_filename()
         self.get_amount_of_points()
         while not self.txt_generated:
-            print("Enter function for v_y(x) (for ex sin(x))\n----> ")
+            print("Enter function for v_y(x)\n"
+                  "For example sin(2*pi*i/self.amount_of_points)\n----> ")
             function = input()
             try:
                 self.create_init_params(function)
@@ -49,8 +51,7 @@ class DataCreate:
         print(f"Ok. The cord is modeled from {self.amount_of_points} points\n")
 
     def create_init_params(self, function):
-        print(function)
-
+        os.chdir('../data')
         delta_r = config.SCREEN_WIDTH / (2*self.amount_of_points)
         x = 0
         y = 0
