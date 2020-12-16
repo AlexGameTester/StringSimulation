@@ -1,12 +1,18 @@
 from math import *
 
+import config
+
+
 class DataCreate:
     def __init__(self):
         self.greeting_text = []
         with open('greeting.txt', 'r') as greeting_file:
             for string in greeting_file:
                 self.greeting_text.append(string.strip())
+
         self.file_name = 'default_name'
+        self.amount_of_points = None
+
         self.txt_generated = False
         self.is_active = True
 
@@ -16,8 +22,9 @@ class DataCreate:
 
     def generate_txt_file(self):
         self.get_filename()
+        self.get_amount_of_points()
         while not self.txt_generated:
-            print("Enter function for y(x) (for ex sin(x))\n----> ")
+            print("Enter function for v_y(x) (for ex sin(x))\n----> ")
             function = input()
             try:
                 self.create_init_params(function)
@@ -36,9 +43,25 @@ class DataCreate:
         self.file_name += '.txt'
         print(f"OK. The future file name is {self.file_name}\n")
 
+    def get_amount_of_points(self):
+        print("Enter the number of points in the file: ")
+        self.amount_of_points = int(input())
+        print(f"Ok. The cord is modeled from {self.amount_of_points} points\n")
+
     def create_init_params(self, function):
-        eval(function)
         print(function)
+
+        delta_r = config.SCREEN_WIDTH / (2*self.amount_of_points)
+        x = 0
+        y = 0
+        max_velocity = 0.4
+        with open(self.file_name, "w") as points:
+            for i in range(self.amount_of_points):
+                velocity = max_velocity * eval(function)
+                point = str(x) + " " + str(y) + " " + str(velocity) + "\n"
+                points.write(point)
+
+                x += delta_r
 
     def talk(self):
         if self.txt_generated and self.is_active:
