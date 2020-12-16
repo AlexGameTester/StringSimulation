@@ -1,0 +1,5 @@
+Hello!
+This module creates a .txt file
+with the initial coordinates and velocities of the cord points.
+This module is implemented using 'eval',
+so you create your own code and are responsible for its security.
