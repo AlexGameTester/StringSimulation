@@ -145,7 +145,7 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text1) <= 0:  # speed of sound must be > 0 validation
+        elif getdouble(text1) < 5:  # speed of sound must be >= 5 validation
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the speed of sound in material is greater or equal than 5")
