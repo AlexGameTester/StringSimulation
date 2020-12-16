@@ -42,14 +42,17 @@ class InputWindow:
         else:
             pass
 
-    def onValidate(self, i):
+    def on_validate(self, i):
         if getdouble(i) > 7:
             self.app.bell()
             return False
         else:
             return True
 
-    def pickfile(self):
+    def pick_file(self):
+        """
+        Creates an open file dialog that takes filepath from user
+        """
         filename1 = filedialog.askopenfilename(parent=self.app, initialdir=DATA_PATH,
                                                title="Select a file with input parameters",
                                                filetypes=(("txt files", "*.txt"), ('png files', '*.png')))
@@ -85,9 +88,9 @@ class InputWindow:
             res_str = s.replace('.', '', 1)
             if len(s) == 0:
                 return "Blanked"
-            elif s[0].isnumeric() == False:
+            elif not s[0].isnumeric():
                 return False
-            elif res_str.isnumeric() == False:
+            elif not res_str.isnumeric():
                 return False
             else:
                 return True
@@ -95,7 +98,8 @@ class InputWindow:
         int_check_list = [check_int(item) for item in list_int]
         real_check_list = [check_whether_real(item) for item in list_real]
 
-        if not all([text1, text2, text3, text4]):#checks whether fields are blanked and if so pastes default values - 5, 5, 20, 10
+        if not all([text1, text2, text3, text4]):  # checks whether fields are blanked and if so pastes default
+            # values - 5, 5, 20, 10
             box1 = messagebox.askquestion("Validation Error: Blank fields",
                                           "Some of the value inputs were left empty, Do you want to use standard "
                                           "values for those which are missing?")
@@ -114,25 +118,25 @@ class InputWindow:
 
             messagebox.showerror("Non-numeric validation error",
                                  "Please check whether number of points and precision parameters are positive integers")
-        elif any(item == False for item in real_check_list):
+        elif not all(real_check_list):
 
             messagebox.showerror("Non-real value validation error",
                                  "Please check whether 'simulation time' and 'sound speed' are positive reals")
         elif any([getdouble(item) < 0 for item in (list_int + list_real)]):
 
             messagebox.showerror("Negative value validation error", "Please check whether all values are positive")
-        elif not all(item for item in int_check_list):
+        elif not all(int_check_list):
 
             messagebox.showerror("Non-integer value validation error",
                                  "Please check whether number of points and precision parameters are integers")
-        elif getint(self.points_entry.get()) > 1000:  ##number of points validation <=3
+        elif getint(self.points_entry.get()) > 1000:  # number of points validation <= 1000
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the number of points in a chain is less or equal than 1000")
+                                 "Please check whether the number of points in a chain is not greater than 1000")
         elif getint(self.precision_entry.get()) > 1000:  # precision validation <=1000
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the precision parameter is less or equal than 1000")
+                                 "Please check whether the precision parameter is not greater than 1000")
         elif getint(self.points_entry.get()) < 3:  # number of points validation >= 3
 
             messagebox.showerror("Parameter is out of range",
@@ -141,31 +145,30 @@ class InputWindow:
 
             messagebox.showerror("Parameter is out of range",
                                  "Please check whether the precision parameter is greater or equal than 10")
-        elif getdouble(text1) > 343:  # speed of sound must be <= 343 validation
+        elif getdouble(text1) > 100:  # speed of sound must be <= 343 validation
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the speed of sound in material is less than or equal than that in an air")
-        elif getdouble(text1) < 5:  # speed of sound must be >= 5 validation
+                                 "Please check whether the speed of sound in material is not greater than 100")
+        elif getdouble(text1) <= 0:  # speed of sound must be >= 5 validation
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the speed of sound in material is greater or equal than 5")
+                                 "Please check whether the speed of sound in material is greater than 0")
         elif getdouble(text2) > 100:  # simulation time must be <= 100 validation
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the simulation time within the required range")
-        elif getdouble(text2) < 5:  # simulation time must be >= 5 validation
+                                 "Please check whether the simulation time is not greater than 100")
+        elif getdouble(text2) < 1:  # simulation time must be >= 1 validation
 
             messagebox.showerror("Parameter is out of range",
-                                 "Please check whether the simulation time is greater or equal than 5")
+                                 "Please check whether the simulation time is at least 1")
         elif self.filename is None:
 
             messagebox.showerror("No file picked",
                                  "Please check whether you have picked file with input parameters")
         else:
-            c = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4),
-                                method=self.pick.get(), file_picked=self.filename)
-            print(c.file_picked)
-            return c
+            params = StartParameters(getdouble(text1), getdouble(text2), getint(text3), getint(text4),
+                                     method=self.pick.get(), file_picked=self.filename)
+            return params
 
     def __init__(self, manager):
         self.manager = manager
@@ -180,7 +183,7 @@ class InputWindow:
         self.app.resizable(width=False, height=False)
         self.filename = None
 
-        validate_command = (self.app.register(self.onValidate), '%i')
+        validate_command = (self.app.register(self.on_validate), '%i')
 
         center_frame = Frame(self.app)
         center_frame.pack(side=TOP)
@@ -221,7 +224,7 @@ class InputWindow:
                          height=2, font=18, text="Start")
         button1.grid(row=5)
 
-        button_pick_file = Button(center_frame, width=10, height=1, command=self.pickfile, text="File menu")
+        button_pick_file = Button(center_frame, width=10, height=1, command=self.pick_file, text="File menu")
         button_pick_file.grid(row=6, column=1)
 
         button2 = Button(center_frame, command=self.exit1, width=4, height=1, font=18,
@@ -235,14 +238,12 @@ class InputWindow:
         self.app.mainloop()
 
     def _start(self):
+        """Start button click handler"""
         params = self.get_parameters()
 
         if params:
             self.manager.start_parameters = params
-        else:
-            raise ValueError('Failed to create parameters')
-
-        self._close()
+            self._close()
 
     def _close(self):
         self.app.destroy()

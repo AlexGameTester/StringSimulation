@@ -229,7 +229,7 @@ def draw_points(screen, phys_points_coord, math_points_coord):
 
         pygame.draw.circle(screen,
                            points_color,
-                           (int(x), int(10 * (y - SCREEN_HEIGHT//2) + SCREEN_HEIGHT // 2)),
+                           (int(x), int(-10 * (y - SCREEN_HEIGHT//2) + SCREEN_HEIGHT // 2)),
                            POINT_RADIUS)
 
     for point in math_points_coord:
@@ -240,7 +240,7 @@ def draw_points(screen, phys_points_coord, math_points_coord):
 
         pygame.draw.circle(screen,
                            points_color,
-                           (int(x + SCREEN_WIDTH // 4), int(10 * y) + SCREEN_HEIGHT // 2),
+                           (int(x + SCREEN_WIDTH // 4), int(-10 * y) + SCREEN_HEIGHT // 2),
                            POINT_RADIUS)
 
 
