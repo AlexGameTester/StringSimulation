@@ -228,7 +228,7 @@ class InputWindow:
                          text="Quit")
         button2.grid(row=5, column=1)
 
-    def do_loop(self):
+    def start_loop(self):
         """
         Starts tkinter mainloop. **Blocks process**
         """

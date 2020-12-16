@@ -21,7 +21,7 @@ class Manager:
         Starts execution of the program
         """
         self._input_window = InputWindow(self)
-        self._input_window.do_loop()
+        self._input_window.start_loop()
 
         if not self.is_closed:
             self.start_calculation()
@@ -33,7 +33,6 @@ class Manager:
             self.start_output()
         else:
             print('User has closed the program before ending calculation')
-            return
 
     def start_calculation(self):
         """
@@ -58,16 +57,6 @@ class Manager:
 
         self._physical_simulation = phys_simulation
         self._mathematical_simulation = math_simulation
-
-    # def on_calculation_ended(self):
-    #     """
-    #     Called (by CalculationsManager) when calculation of simulation is ended
-    #     """
-    #     assert self._mathematical_simulation
-    #     assert self._physical_simulation
-    #     print('Called')
-    #
-    #     self.start_output()
 
     def start_output(self):
         """
