@@ -24,11 +24,15 @@ class DataCreate:
             print(greeting_string)
 
     def generate_txt_file(self):
+        is_amount_of_points_good = False
         self.get_filename()
-        try:
-            self.get_amount_of_points()
-        except Exception as err:
-            print("!!ERROR!! --- ", err)
+        while not is_amount_of_points_good:
+            try:
+                self.get_amount_of_points()
+            except Exception as err:
+                print("!!ERROR!! --- ", err)
+            else:
+                is_amount_of_points_good = True
 
         while not self.txt_generated:
             print("Enter function for y(x)\n"
@@ -58,6 +62,7 @@ class DataCreate:
             raise ValueError('Number of points must be positive')
         elif self.amount_of_points > MAX_POINTS:
             raise ValueError(f'Number of points must be at most {MAX_POINTS}')
+
         print(f"Ok. The cord is modeled from {self.amount_of_points} points\n")
 
     def create_init_params(self, function):
