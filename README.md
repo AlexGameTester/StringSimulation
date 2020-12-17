@@ -148,10 +148,10 @@ you may move forward or backward in animation playback:
 ![Gif PlSp2](https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/gif3.gif)
 
 
-+ To **pause or resume** animation playback press **SpaceBar**, <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/загруженное.png"> 
++ To **pause or resume** animation playback press <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/загруженное.png"> 
 
-+ To **reset** playback press **r**, <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/4.jpg">
++ To **reset** playback press <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/4.jpg">
 
-+ To **set** playback speed to *1* press **s**, <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/загруженное.jpg">
++ To **set** playback speed to *1* press <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/загруженное.jpg">
 
-+ To **Exit** playback animation press **Esc**, <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/kissclipart-esc-keyboard-button-clipart-computer-keyboard-esc-836a93420436eb0a.png">
++ To **Exit** playback animation press <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/kissclipart-esc-keyboard-button-clipart-computer-keyboard-esc-836a93420436eb0a.png">
