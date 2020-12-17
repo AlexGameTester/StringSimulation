@@ -138,8 +138,7 @@ you may move forward or backward in animation playback:
 <img width=40% height=40% class="animated-gif" src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/ezgif.com-video-to-gif.gif">
 
 
-+ To control playback speed press **down** or **up button** - 
-<img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/keyboard_key_up.png"> 
++ To control playback speed press **down** or **up button** - <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/keyboard_key_up.png"> 
 
 
 
