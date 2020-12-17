@@ -111,11 +111,12 @@ If you have executed program with no exceptions you will see *progress bar*,
 The bar allows you to track relative completion time of simulation processing. 
 When processing of simulation will be finished, window will display 100%. And you will see an [animation window](#animation-window).
 
+![Gif PlSp](https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/gif2.gif)
+
 ### **Animation Window**:
 When the processing was done, program will launch animation:
 
-<p><img width=50% height=50% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/Window1.png"></p>
-
+<img width=50% height=50% class="animated-gif" src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/Window1.png">
 
 
 Besides animation itself - red points which represented the string, there is a playback bar:
@@ -134,8 +135,13 @@ For example: pressing **left** or **right button**
 <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/keyboard_key_right.png"> 
 you may move forward or backward in animation playback:
 
-![Gif PlForw](https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/ezgif.com-video-to-gif.gif)
+<img width=40% height=40% class="animated-gif" src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/ezgif.com-video-to-gif.gif">
+
+
++ To control playback speed press **down** or **up button** - 
+<img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/keyboard_key_up.png"> 
 
 
 
 
+![Gif PlSp2](https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/gif3.gif)
