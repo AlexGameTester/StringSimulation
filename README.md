@@ -55,12 +55,23 @@ abstract units of measurenment, not meters per second in particular.
 
 **Default Value** - 1
 
+Also, see [Comment](#comment)
+
 
 2. **Simulation Time**: Simulation time interval length. 
 
 **Validation** - must be a positive real in range  **1 <= param <= 100**.
 
 measured in seconds.
+
+#### comment 
+Field allows real numbers only in decimal notation, with **only one** non-numeric symbol - ".", otherwise it will rise an error.
+
+**Some Examples**
+
+*Correct* - *"3.215"*
+
+*Incorrect* - *"+3.215" , "1..26", "-2.26".*
 
 **Default Value** - 5
 
