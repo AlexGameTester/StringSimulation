@@ -30,7 +30,7 @@ more on Fourier method:
 ## Contents
 - [Description](#description)
 - [Usage](#usage)
-- [Controls](#other-controls)
+- [Controls](#other-keyboard-controls)
 
 
 
