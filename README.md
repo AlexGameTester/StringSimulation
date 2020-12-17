@@ -62,7 +62,7 @@ Also, see [Comment](#comment)
 
 **Validation** - must be a positive real in range  **1 <= param <= 100**.
 
-measured in seconds.
+measured in abstract units.
 
 #### comment 
 Field allows real numbers only in decimal notation, with **only one** non-numeric symbol - ".", otherwise it will rise an error.
