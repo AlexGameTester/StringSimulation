@@ -30,7 +30,7 @@ more on Fourier method:
 ## Contents
 - [Description](#description)
 - [Usage](#usage)
-- [Controls](#other-keyboard-controls)
+- [Controls](#other-controls)
 
 
 
@@ -49,7 +49,7 @@ more on Fourier method:
 1. **Speed of Sound in material**: Speed with which sound wave propagates in the string material. 
 "c" coefficient in the wave equation stands for this parameter.
 
-**Validation** - must be positive real number in range  *5 <= param <= 343*  (speed of sound in the air).
+**Validation** - must be positive real number in range  **0 < param <= 100**.
 
 abstract units of measurenment, not meters per second in particular.
 
@@ -58,7 +58,7 @@ abstract units of measurenment, not meters per second in particular.
 
 2. **Simulation Time**: Simulation time interval length. 
 
-**Validation** - must be a positive real in range  *5 <= param <= 100* .
+**Validation** - must be a positive real in range  **1 <= param <= 100**.
 
 measured in seconds.
 
@@ -76,7 +76,7 @@ no specified units.
 
 4. **Precision of modelling**: parameter on which calculation step (i.e. precision with which these calculations are made).
 
-**Validation** - an integer in range  **10 <= pararm <= 1000** .
+**Validation** - must be an integer in range  **10 <= pararm <= 1000** .
 
 no specified units.
 
