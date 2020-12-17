@@ -30,6 +30,7 @@ more on Fourier method:
 ## Contents
 - [Description](#description)
 - [Usage](#usage)
+- [Controls](#other-controls)
 
 
 
@@ -137,6 +138,7 @@ you may move forward or backward in animation playback:
 
 <img width=40% height=40% class="animated-gif" src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/ezgif.com-video-to-gif.gif">
 
+### Other Keyboard Controls ###
 
 + To control playback speed press **down** or **up button** - <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/keyboard_key_up.png"> 
 
@@ -144,3 +146,12 @@ you may move forward or backward in animation playback:
 
 
 ![Gif PlSp2](https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/gif3.gif)
+
+
++ To **pause or resume** animation playback press **SpaceBar**, <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/загруженное.png"> 
+
++ To **reset** playback press **r**, <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/4.jpg">
+
++ To **set** playback speed to *1* press **s**, <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/загруженное.jpg">
+
++ To **Exit** playback animation press **Esc**, <img width=5% height=5% src="https://github.com/AlexGameTester/StringSimulation/blob/master/images%20for%20readme/kissclipart-esc-keyboard-button-clipart-computer-keyboard-esc-836a93420436eb0a.png">
